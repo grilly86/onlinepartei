@@ -1,0 +1,15 @@
+{foreach from=$chat item=item}
+    <div class="message {if $item.senderid==$user.id}edit{/if}" id="message_{$item.id}" style="clear:both">
+        {if $item.username != $prevUsername}
+        <span class="chatUsername">{$item.username}</span><br>
+        {/if}
+        {assign var='prevUsername' value=$item.username}
+            {if $item.timestamp|date_format:"%Y-%m-%d"==$prevDate}
+                <span class="chatTimestamp">{$item.timestamp|date_format:"%H:%M"}</span>
+            {else}
+                <span class="chatTimestamp">{$item.readableDate}</span>
+            {/if}            
+            {assign var ='prevDate' value=$item.timestamp|date_format:"%Y-%m-%d" }                    
+			<span class="chatMessage">{$item.message}</span>
+    </div>
+{/foreach}

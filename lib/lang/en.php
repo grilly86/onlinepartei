@@ -1,0 +1,65 @@
+<?php
+class Lang
+{
+	var $languageArray=array(
+		"send"=>"Send",
+		"save"=>"Save",
+		"login"=>"Login",
+		"register"=>"Register",
+		"logout"=>"Logout",
+		"email"=>"E-Mail",
+		"password"=>"Password",
+		"repeatPassword"=>"Repeat",
+		"settings"=>"Settings",
+		"profile"=>"Profile",
+		"nickname"=>"Nick name",
+		"profileImage"=>"Profile image",
+		"newStatus"=>"Update status",
+		"statusTooltip"=>"Status updates are being showed in your profile",
+		"statusBlank"=>"What do you want to share?",
+		"newDiscuss"=>"New discussion",
+		"discussTooltip"=>"Open a new discussion!",
+		"discussCaptionBlank"=>"Topic of discussion",
+		"discussBlank"=>"...",
+		"imprint"=>"Imprint",
+		"sourcecode"=>"Get Source Code",
+		"settingsFor"=>"Settings for",
+		"language"=>"Language",
+		"languageGerman"=>"German",
+		"languageEnglish"=>"English",
+		"notBeingShown"=>"is not being showed",
+		"all"=>"All",
+		"online"=>"Last online",
+		"closeChat"=>"Close chat window",
+		"newest"=>"latest",
+		"dateOn"=>"on",
+		"dateAt"=>"at",
+		"dateOclock"=>"",
+		"today"=>"today",
+		"yesterday"=>"yesterday",
+		"none"=>"No",
+		"comment"=>"comment",
+		"comments"=>"comments",
+		"commentBlank"=>"Comment ...",
+		"guest"=>"Guest",
+		"postDeleted"=>"Comment deleted",
+		"openChat"=>"Open chat",
+		"showProfile"=>"Show profile",
+		"by"=>"by",
+		"in"=>"in",
+		"ina"=>"in a",
+		"anonymousComment"=>"Anonymous comments can be edited and deleted by everyone. Log in to avoid editing.",
+		"holdShiftToBreak"=>"Press and hold the Shift-key (&uArr;) while pressing enter (&crarr;) to insert a line break.",
+		"logInToRate"=> "You need to log in to rate!",
+		"clickToComment"=>"Click to comment",
+		"like"=>"Agree",
+		"dislike"=>"Disagree",
+		"NrLike"=>"Agree ",
+		"NrDislike"=>"Disagree"
+	);
+	
+	var $monthArray = Array("January","February","March","April","May","June","July","August","September","October","November","December");		 
+	var $dayOfWeekArray = Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+	
+}
+?>

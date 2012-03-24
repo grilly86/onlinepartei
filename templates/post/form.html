@@ -1,0 +1,45 @@
+<div class="contentWrapperContainer">
+	{if $loggedIn}
+	<div class="contentToolbarContainer">
+	<a class="addPost status active qtipTitle tooltipLeft" href="javascript:void(0);" title="{$lang.statusTooltip}">{$lang.newStatus}</a>
+	<a class="addPost discuss qtipTitle" href="javascript:void(0);" title="{$lang.discussTooltip}">{$lang.newDiscuss}</a>
+		<br clear="left" />
+		<form class="newPostForm status show" name="newStatusForm" id="newStatusForm" method="post">
+			<span class="addPostArrow status"></span>
+			<textarea id="statusMessage" class="text message empty" name="status"></textarea>
+			<br clear="left" />
+			<input type="submit" class="submit" value="{$lang.send}" />
+			<span class="resizeHandleVertical"></span>
+			<input type="hidden" name="isUserReal" />
+		</form>
+		<form class="newPostForm discuss" name="newDiscussForm" id="newDiscussForm">
+			<span class="addPostArrow discuss"></span>
+			<input type="text" class="text empty bold" name="caption" id="postCaption" />
+			<br clear="left"/>
+			<textarea id="postMessage" class="text message empty" name="message"></textarea>
+			<br clear="left" />
+			<input type="submit" class="submit show" value="{$lang.send}" />
+			<span class="resizeHandleVertical show"></span>
+			<input type="hidden" name="isUserReal" />
+		</form>
+	</div>
+	{/if}
+	
+	<input type="hidden" id="postCount" value="{$postCount}" />
+	<div class="listFilterContainer">
+		<!--<label for="searchInput">Filter:</label>
+		<input type="text" name="search" id="searchInput">-->
+		<a class="sortLink desc">
+			{$lang.newest}
+			<span class="arrow desc"></span>
+		</a>
+	</div>
+	
+	<!-- posts are listed here: -->
+	
+	{if $TPL_POSTS}
+	{$TPL_POSTS}
+	{else}
+	<a href="all" class="loading"/>Lade Posts</a>
+	{/if}
+</div>

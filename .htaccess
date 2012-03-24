@@ -1,0 +1,16 @@
+php_value register_globals 0
+
+RewriteEngine on
+
+RewriteRule ^style.css$ style.php [L]
+
+RewriteRule ^chat/message$ chat.php?task=message&%{QUERY_STRING} [L]
+RewriteRule ^chat$ chat.php?%{QUERY_STRING} [L]
+
+RewriteRule ^settings$ index.php?task=settings&%{QUERY_STRING} [L]
+RewriteRule ^logout$ index.php?task=logout&%{QUERY_STRING} [L]
+RewriteRule ^u([\d]+)$ index.php?task=profile&id=$1&%{QUERY_STRING} [L]
+RewriteRule ^all$ index.php?task=getPosts&%{QUERY_STRING} [L]
+RewriteRule ^p([\d]+)$ index.php?task=showPost&id=$1&%{QUERY_STRING} [L]
+RewriteRule ^comments$ index.php?task=getComments&%{QUERY_STRING} [L]
+RewriteRule ^sendComment$ index.php?task=sendComment&%{QUERY_STRING} [L]
