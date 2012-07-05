@@ -1,0 +1,282 @@
+		<div class="contentWrapperContainer">
+			<div class="contentTitleContainer">
+				{$lang.settingsFor} {$user.name}
+			</div>
+			<div class="contentContainer postContainer">
+				<h1>{$lang.profile}</h1>
+				<form name="profile" method="post" action="index.php?task=settings" enctype="multipart/form-data">
+					<div>
+						<label for="nickname">
+							{$lang.email}:
+						</label>
+						<label style="color:#999;width:300px;">{$user.email} (wird nicht angezeigt)</label>
+					</div>
+					<div>					
+						<label for="nickname">
+							{$lang.nickname}:
+						</label>
+						<input class="text" type="text" name="nickname" id="nickname" value="{$user.name}" />
+					</div>
+					<div>
+						<label for="language">
+							{$lang.language}
+						</label>
+						<select id="language" name="language">
+							<option value="de" {if $user.language=="de"}selected="selected"{/if}>{$lang.languageGerman}</option>
+							<option value="en" {if $user.language=="en"}selected="selected"{/if}>{$lang.languageEnglish}</option>
+						</select>
+					</div>
+					<div>
+						<label for="colorPickerInput">Farbe:</label>
+						<input type="text" class="text" id="colorPickerInput" name="color" value="{$user.color}" />
+						<div id="colorPicker"></div>
+						{*<span><strong>Hinweis: </strong>F&uuml;r optimale Lesbarkeit wird ein <strong>dunkler Farbwert</strong> empfohlen!</span></div>*}
+					</div>
+					<div>
+						<label for="profileImage">
+							{$lang.profileImage}:
+						</label>
+						{if $user.hasImage}
+							<img src="uploads/p/{$user.id}.jpg?time={$smarty.now}">
+							<br clear="all" />
+						{/if}
+						<input class="text" type="file" name="profileImage" size="20" id="profileImage" />
+					</div>
+					<div class="preview">
+						<div class="drawAvatarSize">
+							<div class="drawAvatarResize">
+							</div>
+						</div>
+						<div id="thumbDiv"></div>
+						<img id="thumb" />
+						<img id="preview" />
+						<br clear="all" />
+					</div>
+					<input type="hidden" name="uploadProfileImage" id="uploadProfileImage" value="0" />
+					<br clear="left" />
+					<br clear="left" />
+					<fieldset >
+						<legend>Privatsph&auml;re</legend>
+						(noch nicht implementiert)</p>
+						<label for="checkChatAll" class="auto"><input disabled class="check" type="checkbox" name="chatAll" id="checkChatAll" value="1" checked="checked">Im Chat f&uuml;r alle sichtbar</label>
+						<br clear="left" />
+						<label for="checkOnlineState" class="auto"><input disabled class="check" type="checkbox" name="onlineState" id="checkOnlineState" value="1" checked="checked">Online-Status anzeigen</label>
+						<br clear="left" />
+						<label for="checkOnlineTime" class="auto"><input disabled class="check" type="checkbox" name="onlineTime" id="checkOnlineTime" value="1" checked="checked">Zeitpunkt der letzten Aktivit&auml;t anzeigen</label>
+						<p>
+						
+					</fieldset>
+					<br clear="left" />
+					<input class="submit" type="submit" value="{$lang.save}" />
+					<br clear="left" />
+					<br clear="left" />
+				</form>
+			</div>
+			<br clear="all" />
+		</div>
+	</div>
+{literal}
+<script type="text/javascript" src="static/script/ajaxupload.js"></script>
+<script type="text/javascript">
+	$().ready(function() {
+							var thumb = $('img#thumb');	
+
+							new AjaxUpload('profileImage', {
+											action: "index.php?task=fileUpload",
+											name: 'profileImage',
+											onSubmit: function(file, extension) {
+															$('div.preview').addClass('loading');
+											},
+											onComplete: function(file, response) {
+															thumb.load(function(){
+																		$('div.preview').removeClass('loading');
+																		thumb.unbind();
+																		initializeAvatarSize(response);
+
+															});
+															var date = new Date();
+															thumb.attr('src', response+ "?time=" + date.getTime());
+
+
+
+											}
+							});
+	});
+
+	function initializeAvatarSize(response)
+	{
+
+								$("div.preview").show();
+								//alert(response);
+								var date = new Date();
+								$("#thumbDiv").css("background", "url(" + response + "?time=" + date.getTime() + ") no-repeat");
+								$("#thumbDiv").width($("#thumb").width());
+								$("#thumbDiv").height($("#thumb").height());
+								$("#thumb").hide();
+		$(".drawAvatarSize").show();
+
+		var left=0;var top=0;
+		var height = $("#thumb").height();
+		var width = $("#thumb").width();
+		if (height > width)
+		{
+			top = (height-width)/2;
+			height=width;
+		}
+		if (height < width)
+		{
+			left = (width-height)/2;
+			width=height;
+		}
+		$(".drawAvatarSize").width(width);
+		$(".drawAvatarSize").height(height);
+		$(".drawAvatarSize").css("left", left + "px");
+		$(".drawAvatarSize").css("top", top + "px");
+
+		refreshAvatarPreview();
+
+		var dragAvatarStartX = 0;
+		var dragAvatarStartY = 0;
+		var dragMouseStartX = 0;
+		var dragMouseStartY = 0;
+
+		var dragAvatar = false;
+
+		$(".drawAvatarSize").mousedown(function(e) {
+			dragMouseStartX = e.pageX;
+			dragMouseStartY = e.pageY;
+			dragAvatarStartX = $(".drawAvatarSize").position().left;
+			dragAvatarStartY = $(".drawAvatarSize").position().top;
+			//console.log(e);
+			dragAvatar = true;
+		});
+		$(".drawAvatarSize").mouseup(function(e) {
+
+		});
+		$(".drawAvatarSize").mousemove(function(e) {
+			if (dragAvatar && !resizeAvatar)
+			{
+				var newX = e.pageX - dragMouseStartX + dragAvatarStartX;
+				var newY = e.pageY - dragMouseStartY + dragAvatarStartY;
+				if (newX + $(".drawAvatarSize").width()>$("#thumbDiv").width())
+				{
+					newX = $("#thumbDiv").width()-$(".drawAvatarSize").width();
+				}
+				if (newY + $(".drawAvatarSize").height()>$("#thumbDiv").height()) 
+				{
+					newY = $("#thumbDiv").height()-$(".drawAvatarSize").height();
+				}
+				if (newX < 0) newX = 0;
+				if (newY < 0) newY = 0;
+				$(".drawAvatarSize").css("left",newX+"px");
+				$(".drawAvatarSize").css("top",newY+"px");
+
+				clearTimeout(refreshAvatarTimer);
+				refreshAvatarTimer = setTimeout("refreshAvatarPreview()",300);
+			}
+		});
+		var resizeAvatarStartWidth = 0;
+		var resizeAvatarStartHeight = 0;
+		var resizeAvatarMouseX = 0;
+		var resizeAvatarMouseY = 0;
+		var resizeAvatar = false;
+		$(".drawAvatarResize").mousedown(function(e) {
+			resizeAvatar = true;
+			resizeAvatarStartWidth = $(".drawAvatarSize").width();
+			resizeAvatarStartHeight = $(".drawAvatarSize").height();
+			resizeAvatarMouseX = e.pageX;
+			resizeAvatarMouseY = e.pageY;
+		});
+		$(window).mouseup(function(e) {
+			resizeAvatar=false;
+			dragAvatar=false;
+		});
+		$(window).mousemove(function(e) {
+			if (resizeAvatar)
+			{
+				var newWidth = e.pageX-resizeAvatarMouseX+resizeAvatarStartWidth;
+				var newHeight = e.pageY-resizeAvatarMouseY+resizeAvatarStartHeight;
+				if (newHeight >= 48 || newWidth >= 48)
+				{
+					if (($(".drawAvatarSize").position().left+newWidth <= $("#thumbDiv").width())&&($(".drawAvatarSize").position().top+newHeight <= $("#thumbDiv").height()))
+					{ 
+					if (newHeight > newWidth)
+					{
+						$(".drawAvatarSize").width(newHeight);
+						$(".drawAvatarSize").height(newHeight);
+					}
+					else
+					{
+						$(".drawAvatarSize").width(newWidth);
+						$(".drawAvatarSize").height(newWidth);
+					}
+					clearTimeout(refreshAvatarTimer);
+					refreshAvatarTimer = setTimeout("refreshAvatarPreview()",300);
+					}
+				}
+			}
+		});
+	}
+	function refreshAvatarPreview()
+	{
+		var dataString = "left=" + $(".drawAvatarSize").position().left + "&top=" + $(".drawAvatarSize").position().top + "&width=" + $(".drawAvatarSize").width() + "&height=" + $(".drawAvatarSize").height();
+		$.ajax({
+			url:"index.php?task=generateAvatarPreview",
+			type:"get",
+			data:dataString,
+			success:function(data){
+				var date = new Date();
+				//console.log(date.getTime());
+				$("#preview").attr("src",data + "?time=" + date.getTime());
+
+				var marginBottom = ($("#thumbDiv").height()-48)/2;
+				if (marginBottom < 0) marginBottom = 0;
+
+				var marginLeft = ($("div.preview").width()-$("#thumbDiv").width()-48)/2;
+				$("#preview").css("marginTop",marginBottom + "px");
+				$("#preview").css("marginLeft",marginLeft + "px");
+				$("#uploadProfileImage").val(1);
+			}
+		});
+	}
+	var refreshAvatarTimer;
+</script>
+
+<script type="text/javascript" src="static/script/farbtastic/farbtastic.js"></script>
+<script type="text/javascript">
+	$().ready(function() {
+		$('#colorPicker').farbtastic("#colorPickerInput");
+			
+			$("#colorPickerInput").focus(function() {
+				$("#colorPicker").fadeIn();
+			}).blur(function() {
+				$("#colorPicker").fadeOut();
+			});
+				
+	});
+	
+</script>
+{/literal}
+{*<script type="text/javascript" src="static/script/modcoder_excolor/jquery.modcoder.excolor.js"></script>
+<script type="text/javascript">
+	$().ready(function() {
+		
+		$('#colorPicker').modcoder_excolor({
+		   hue_slider : 75,
+		   sb_slider : 1,
+		   border_color : '#6e6e6e',
+		   sb_border_color : '#b3b3b3',
+		   round_corners : true,
+		   shadow : false,
+		   backbrground_color : '#dedede',
+		   backlight : false,
+		   label_color : '#757575',
+		   effect : 'fade',
+		   speed:'fast',
+		   callback_on_ok : function() {
+			  // You can insert your code here 
+		   }
+		});
+		
+	});
+</script>*}

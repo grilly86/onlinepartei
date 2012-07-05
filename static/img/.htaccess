@@ -1,0 +1,25 @@
+RewriteEngine on
+
+#php_value upload_max_filesize 200M
+#php_value post_max_size 200M
+#php_value max_execution_time 20000
+#php_value max_input_time 20000
+
+RewriteRule ^content/([^/]*)/ajaxSort[\/]?$ index.php?mode=content&action=ajaxSort&id=$1&%{QUERY_STRING}
+RewriteRule ^content/([^/]*)/([^/]*)/([\d]+)[\/]?$ index.php?mode=content&action=$1&type=$2&id=$3&%{QUERY_STRING} [L]
+#RewriteRule ^ocw[\/]?$ index.php?mode=content&id=ocw&%{QUERY_STRING} [L]
+#RewriteRule ^media[\/]?$ index.php?mode=media&%{QUERY_STRING} [L]
+#RewriteRule ^settings[\/]?$ index.php?mode=settings&%{QUERY_STRING} [L]
+RewriteRule ^login[\/]?$ index.php?mode=login&%{QUERY_STRING} [L]
+RewriteRule ^logout[\/]?$ index.php?mode=logout&%{QUERY_STRING} [L]
+RewriteRule ^category/([^/]*)[\/]?$ index.php?mode=category&action=$1&%{QUERY_STRING} [L]
+RewriteRule ^category/([^/]*)/([\d]+)[\/]?$ index.php?mode=category&action=$1&id=$2&%{QUERY_STRING} [L]
+RewriteRule ^category/ajaxSort[\/]?$ index.php?mode=category&action=ajaxSort&id=$1&%{QUERY_STRING} [L]
+RewriteRule ^neu/(.*) neu/$1 [L]
+RewriteRule ^alt/(.*) alt/$1 [L]
+RewriteRule ^pma/(.*) pma/$1 [L]
+#RewriteRule ^$ index.php?mode=content&id=home&%{QUERY_STRING} [L]
+#RewriteRule ^home[\/]?$ index.php?mode=content&id=home&%{QUERY_STRING} [L]
+RewriteRule ^forum[\/]?$ index.php?mode=forum&%{QUERY_STRING} [L]
+RewriteRule ^search[\/]?$ index.php?mode=search&%{QUERY_STRING} [L]
+RewriteRule ^([^/^.]*)[\/]?$ index.php?mode=content&id=$1&%{QUERY_STRING}

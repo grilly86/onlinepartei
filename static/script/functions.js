@@ -9,20 +9,21 @@
 	var allTimer, chatTimer= new Array();
 	var onlineTimer;
 	var blinkTimer;
-	var channelAllFrequency = 10000; // Alle X Sekunden wird nach neuen
+	var channelAllFrequency = 15000; // Alle X Sekunden wird nach neuen
 									// Post von allen Benutzern gefragt.
 	var channelChatFrequency = 4000;		// Wenn ein Chat-Fenster geöffnet 
 									// wird alle X Sekunden nach neuen 
 									// Posts gefragt.
 var limitFrom=0;
-var limitCount=30;
+var limitCount=20;
 var postCount=0;
 var muteSound = false;
 
+var ajaxHandler;
 function getPosts(limit,order,parent)
-{
-	$("a.loading").remove();
+{	
 	
+	$("a.loading").remove();
 	var limitString="", orderString="";
 	
 	if (limit)
@@ -34,25 +35,45 @@ function getPosts(limit,order,parent)
 		orderString = "&order=" + order;
 	}
 	parent = parseInt(parent);	// if not set then zero
+	
 	var dataString = "parent=" + parent + limitString + orderString;
-	$.ajax({
+	
+	//if (ajaxHandler) ajaxHandler.abort();
+	ajaxHandler = $.ajax({
 		url:"index.php?task=getPosts",
 		type:"post",
 		data:dataString,
 		success:function(data) {
-			//console.log(data);
-			$(".contentWrapperContainer").append(data);
+			if (!data)
+			{
+				scrolledToEnd = true;
+			}
+			
+			//console.log("returned: " + limit);
+			
+			//var vorher = $(".contentWrapperContainer").find(".postContainer").length;
+			
+			$(".contentWrapperContainer").append(data).removeClass("loading");
+			
+			//var nachher = $(".contentWrapperContainer").find(".postContainer").length;
+			
+			//console.log("vorher: " + vorher + " | nachher: " + nachher);
 			initializeFancybox($(".contentWrapperContainer"));
 			initializeTooltips();
+			//window.onscroll=undefined;
 		}
 	});
-
 }
-
+var scrolledToEnd = false;
+window.onscroll = function() {
+	$(window).scrollTop(1);
+};
 $().ready(function() {
-	
+	setTimeout(function(){
+		$(window).scrollTop(0);
+		window.onscroll=undefined;
+	},1000);
 	$(".contentWrapperContainer").click(function() {
-		
 		var obj = $(".chatContainer.active");
 		if (obj.length)
 		{
@@ -65,20 +86,21 @@ $().ready(function() {
 			obj.remove();
 		}
 	});
-	postCount = parseInt($("#postCount").val());
-	if (postCount)
+	
+	var getPostHandler;
+	if ($(".contentWrapperContainer").find(".postContainer").length==0)
 	{
 		getPosts(limitFrom+","+limitCount);
-		scrollToPos(0);
 		$(window).scroll(function() {
-
 			var scrollTop = $(this).scrollTop();
 			var scrollHeight = $(document).height()-$(window).height();
-			if (scrollTop == scrollHeight)	//scrolled to Bottom
+			if (scrollTop > scrollHeight-2)	//scrolled to Bottom
 			{
-				limitFrom += limitCount;
-				if (limitFrom<postCount)
+				if (!scrolledToEnd)
 				{
+					limitFrom += limitCount;
+					$(".contentWrapperContainer").addClass("loading");
+					clearTimeout(getPostHandler);
 					getPosts(limitFrom+","+limitCount);
 				}
 			}
@@ -99,14 +121,15 @@ $().ready(function() {
 	muteSound = $.cookie("muteSound");
 	if (muteSound==="true")
 	{
-		$(".soundButton").removeClass("on").addClass("off");
+		$(".soundButton").removeClass("on").addClass("off").attr("title", lang["unmuteSound"]);
 		muteSound=true;
 	}
 	else
 	{
+		//$(this).removeClass("on").addClass("off").attr("title", lang["muteSound"]);
 		muteSound = false;
 	}
-	adjustWindowSize();
+	
 	if ($("#chatUserList").length)
 	{
 		allTimer = setTimeout("channelAll()",100);
@@ -140,13 +163,14 @@ $().ready(function() {
 	$(".soundButton").click(function() {
 		if ($(this).hasClass("on"))
 		{
-			$(this).removeClass("on").addClass("off");
+			$(this).removeClass("on").addClass("off").attr("title", lang["unmuteSound"]);
 			muteSound = true;
 			$.cookie("muteSound","true");
+			
 		}
 		else
 		{
-			$(this).removeClass("off").addClass("on");
+			$(this).removeClass("off").addClass("on").attr("title", lang["muteSound"]);
 			muteSound = false;
 			$.cookie("muteSound","false");
 		}
@@ -248,7 +272,7 @@ $().ready(function() {
 		var width=48,height=48,marginTop=-17,marginLeft=0,right=0;
 		if ($(this).hasClass("profileImage post") || obj.hasClass("post"))
 		{
-			width=48;height=48;marginTop=-22;marginLeft=-20;right=0;
+			width=48;height=48;marginTop=-22;marginLeft=0;right=-20;
 			if (!obj.hasClass("post"))
 			{
 				obj = $(this);
@@ -270,6 +294,8 @@ $().ready(function() {
 		{
 			var that = this;
 			var id = parseInt($(this).parent().parent().attr("rel").substr(5));
+			var type = $(this).parent().parent().attr("rel").substr(0,4);
+			
 			var rating="like";
 			var unrate = false,unrateStr ="";
 			if ($(this).hasClass("dislike"))
@@ -282,6 +308,10 @@ $().ready(function() {
 				unrateStr = "&unrate=true";
 			}
 			var dataString = "id=" + id + "&rating=" + rating + unrateStr;
+			if (type=="poll")
+			{
+				dataString += "&type=poll";
+			}
 			$.ajax({
 				url:'index.php?task=rating',
 				type:'post',
@@ -336,7 +366,7 @@ $().ready(function() {
 		var width=27,height=27,marginTop=-6,marginLeft=0,right=3;
 		if ($(this).hasClass("profileImage post") || obj.hasClass("post"))
 		{
-			width=16;height=16;marginTop=-2;marginLeft=0,right=16;
+			width=16;height=16;marginTop=-2;marginLeft=0,right=5;
 			if (!obj.hasClass("post"))
 			{
 				obj = $(this);
@@ -352,33 +382,131 @@ $().ready(function() {
 			.removeClass("unzooming");
 		} 
 	});
-
-	$("a.footerButton.comment").live("click", function () {
-		if ($(this).hasClass("active"))
+	
+	$("input.tag").live("focus", function() {
+		if ($(this).val()=="")
 		{
-			$(this).parent().parent().find(".commentContainerWrapper").slideUp(500,function() { $(this).empty() });
-			$(this).removeClass("active");
+			$(this).removeClass("empty");
 		}
-		else
+	});
+	$("input.tag").live("blur", function() {
+		if ($(this).val()=="")
+		{
+			$(this).addClass("empty");
+		}
+	});
+	$("input.tag").live("keydown", function(e) {
+		if (e.keyCode == 13)
 		{
 			var that = this;
-			var id = parseInt($(this).parent().parent().attr("rel").substr(5));
-			var dataString = "id=" + id;
+			var value = $(this).val(), id = $(this).parent().parent().parent().parent().attr("rel");
+			var type = id.substr(0,4);
+			id = id.substr(5);
+			
+			//console.log(type);
+			if (value != "" && id && type)
+			{
+				$.ajax({
+					url:'tag',
+					type:'post',
+					data:'id=' + id + "&type=" + type + "&name=" + value,
+					success:function(data)
+					{
+						if (data=="200")
+						{
+							var obj = $(that).parent().parent().parent().find("div.tag");
+							//console.log(obj);
+							var comma = "";
+							if (obj.children().length>0)
+							{
+								comma = ", ";
+							}
+							$(obj).append(comma + "<a href='tag/" + value + "'>"+value+"</a><span class='tagRemove' rel='"+value+"'></span>");
+							$(that).val("").addClass("empty").blur();
+						}
+						if (data=="500")
+						{
+							//alert("500");
+							$(that).val("").addClass("empty").blur();
+						}
+					}
+				});
+			}
+		}
+		if (e.keyCode == 27)
+		{
+			$(this).val("").addClass("empty").blur();
+		}
+	});
+	$("span.tagRemove").live("mouseover",function() {
+		$(this).addClass("hover");
+	});
+	$("span.tagRemove").live("mouseout",function() {
+		$(this).removeClass("hover");
+	});
+	$("span.tagRemove").live("click",function() {
+		var that = this;
+		var name = $(this).attr("rel");
+		var id = $(this).parent().parent().parent().attr("rel");
+		var type=id.substr(0,4);
+		id=id.substr(5)
+		if (confirm(lang['tagRemoveConfirm']))
+		{
 			$.ajax({
-				url:"comments",
+				url:"tag",
 				type:"post",
-				data:dataString,
-				success:function(data) {
-					$(that).addClass("active");
-					var wrapper = $(that).parent().parent().find(".commentContainerWrapper");
-					$(wrapper).html(data).slideDown(500,"linear", function() {
-						//animation complete (height final)
-						initializeFancybox(wrapper);
-					});
-					var top = $(wrapper).offset().top;
-					scrollToPos(top);
+				data:"action=remove&name=" + name + "&type=" + type + "&id=" + id,
+				success:function(data)
+				{
+					if (data=="200")
+					{
+						$(that).prev().remove();
+						$(that).remove();
+					}
 				}
-			});
+			})
+			
+		}
+	});
+	var footerButtonWaiting =false;
+
+	$("a.footerButton.comment").live("click", function () {
+		if (!footerButtonWaiting)
+		{
+			if ($(this).hasClass("active"))
+			{
+				var obj = this;
+				$(this).parent().parent().find(".commentContainerWrapper:eq(0)").slideUp(300, function() {
+					$(obj).removeClass("active");
+				});
+			}
+			else
+			{
+				var that = this;
+				var id = parseInt($(this).parent().parent().attr("rel").substr(5));
+				var type = $(this).parent().parent().attr("rel").substr(0,4);
+				var dataString = "id=" + id;
+				if (type=="poll")
+				{
+					dataString += "&type=poll";
+				}
+				$.ajax({
+					url:"comments",
+					type:"post",
+					data:dataString,
+					success:function(data) {
+
+						$(that).addClass("active");
+						var wrapper = $(that).parent().parent().find(".commentContainerWrapper");
+						$(wrapper).html(data).slideDown(500,"linear", function() {
+							//animation complete (height final)
+							initializeFancybox(wrapper);
+						});
+						var top = $(wrapper).offset().top;
+						scrollToPos(top);
+					}
+				});
+			}
 		}
 		return false;
 	});
@@ -393,6 +521,7 @@ $().ready(function() {
 		}
 		if (e.keyCode==13 && !(holdShift || holdStrg))
 		{
+
 			if ($(this).hasClass("edit") || $(this).val()!="")
 			{
 				$(this).parent().addClass("edit");
@@ -456,6 +585,7 @@ $().ready(function() {
 		var parentID=0;
 		var isNew = false;
 		var id = 0;
+		var type="", typeDataString="";
 		var obj = $(that).parent();
 		if ($(that).hasClass("edit"))
 		{
@@ -464,7 +594,7 @@ $().ready(function() {
 			if ($(that).parent().parent().parent().hasClass("postContainer"))
 			{
 				parentID = parseInt($(that).parents(".postContainer").attr("rel").substr(5));
-				obj = $(that).parents(".postContainer");
+				obj = $("div.message[rel=post_"+parentID+"]").parent();
 			}
 			else
 			{
@@ -477,15 +607,20 @@ $().ready(function() {
 			//new 
 			isNew = true;
 			parentID = parseInt($(that).parent().parent().attr("rel").substr(5));
+			type = $(that).parent().parent().attr("rel").substr(0,4);
+			if (type=="poll")
+			{
+				typeDataString = "&type=" + type;
+			}
+			
 		}
-		
 		if (parentID>0)
 		{
 			var message = escape(encodeURIComponent($(that).val()));
 			$.ajax({
 				url:"sendComment",
 				type:"post",
-				data:"message="+message + "&parentID=" + parentID + "&id=" + id,
+				data:"message="+message + "&parentID=" + parentID + "&id=" + id + typeDataString,
 				success:function(data){
 					if (isNew)
 					{
@@ -503,14 +638,20 @@ $().ready(function() {
 					}
 					
 					var scrollStore = $(document).scrollTop();
-					//console.log(obj);
 					if ($(obj).hasClass("commentWrapper"))
 					{
 						$(obj).replaceWith(data);
 					}
+					else if($(obj).hasClass("postContainer"))
+					{
+						$(obj).html(data);
+					}
+					else if ($(obj).hasClass("postMessageContainer"))
+					{
+						$(obj).parent().replaceWith(data);
+					}
 					else
 					{
-						//console.log(obj);
 						$(obj).parent().find(".commentContainerWrapper").html(data);
 					}
 					
@@ -524,7 +665,7 @@ $().ready(function() {
 					scrollToPos(scrollStore);
 				}
 			});
-			
+			return false;
 		}
 	}
 	//on Click on a comment, show EDIT menu
@@ -568,25 +709,45 @@ $().ready(function() {
 	
 	$(".chatLink").live("click",function(e){
 		$(this).removeClass("new");
-		var id = $(this).attr("href").substring(5);
+		var id = $(this).attr("href").substring(1);
 		//alert($("#chatWindows").find("#chat_" + id).length);
 		openChat(id);
 	return false;
 	});
 
-		// Default Input Values 
-		var isStatusFocused=false;
 		// für "Status aktualisieren"
-	 $("#statusMessage").val(lang['statusBlank']);
-	 $(".newPostForm.status").focusin(function() {
-	 
-		isStatusFocused=true;
-		 if ($("#statusMessage").val()==lang['statusBlank'])
+	 $("#pollQuestion").val(lang['pollQuestion']);
+	 $("#pollQuestion").focus(function() {
+		 if ($("#pollQuestion").val()==lang['pollQuestion'])
 		 {
-			$("#statusMessage").animate({height:100},500).removeClass("empty").parent().find(".submit").addClass("show").parent().find(".resizeHandleVertical").addClass("show"); 
-			$("#statusMessage").val("");
+			$("#pollQuestion").val("");
+			$("#pollQuestion").removeClass("empty");
 		 } 
 	 });
+	  $("#pollQuestion").blur(function() {
+		if ($(this).val()=="")
+		{
+			$("#pollQuestion").val(lang["pollQuestion"]);
+			$("#pollQuestion").addClass("empty");
+		}
+	});
+	
+	$("#pollDescription").val(lang['pollDescription']);
+	 $("#pollDescription").focus(function() {
+		 if ($("#pollDescription").val()==lang['pollDescription'])
+		 {
+			$("#pollDescription").val("");
+			$("#pollDescription").removeClass("empty");
+		 } 
+	 });
+	  $("#pollDescription").blur(function() {
+		if ($(this).val()=="")
+		{
+			$("#pollDescription").val(lang["pollDescription"]);
+			$("#pollDescription").addClass("empty");
+		}
+	});
+	
 	 var storeStatusHeight = 0;
 	 $("#statusMessage").keydown(function(e) {
 		isStatusFocused=false;
@@ -607,10 +768,13 @@ $().ready(function() {
 		}
 		
 	 });
-	 // für Diskussion:
-	 $("#postCaption").val(lang["discussCaptionBlank"]);
+	 // für Meldungen:
+	 $("#postCaption").val(lang["postCaptionBlank"]);
+	 $("#postCaption").hide();
+	 
 	 $("#postCaption").focus(function() {
-		 if ($(this).val()==lang["discussCaptionBlank"])
+		 
+		 if ($(this).val()==lang["postCaptionBlank"])
 		 {
 				$(this).val("") ;
 				$(this).removeClass("empty");
@@ -619,16 +783,18 @@ $().ready(function() {
 	 $("#postCaption").blur(function() {
 		if ($(this).val()=="")
 		{
-			$("#postCaption").val(lang["discussCaptionBlank"]);
+			$("#postCaption").val(lang["postCaptionBlank"]);
 			$("#postCaption").addClass("empty");
 		}
 	});
-	$("#postMessage").val(lang["discussBlank"]);
+	$("#postMessage").val(lang["postBlank"]);
 	$("#postMessage").focus(function(){
-		if ($(this).val()==lang["discussBlank"])
+		if ($(this).val()==lang["postBlank"])
 		{
+			$("#postCaption").show();
 			$(this).val("");
 			$(this).removeClass("empty");
+			
 		}
 	});
 	$("#postMessage,#postCaption,#statusMessage").keydown(function(){
@@ -642,26 +808,28 @@ $().ready(function() {
 			resizeXPos=$(resizeContainer).width();
 			resizeYPos=$(resizeContainer).height();
 		});
-		$("#newStatusForm").submit(function() {
-			//alert("Kein Text eingebeben!");
-			if ($("#statusMessage").val()!="" && $("#statusMessage").val()!=lang['statusBlank'])
+		$("#newPostForm").submit(function() {
+			if ($("#postMessage").val()!="" && $("#postMessage").val()!=lang['postBlank'])
 			{
-				var dataString = "status=" + escape(encodeURIComponent($("#statusMessage").val()));
+				var dataString = "message=" + escape(encodeURIComponent($("#postMessage").val()));
+				
+				if ($("#postCaption").val()!="" && $("#postCaption").val()!=lang['postCaptionBlank'])
+				{
+					dataString += "&caption=" + escape(encodeURIComponent($("#postCaption").val()));
+				}
 				$.ajax({
 					url:"index.php?task=ajaxPost",
 					type:"post",
 					data:dataString,
 					success:function(data){
-						$("#statusMessage").val(lang['statusBlank']);
-						$("#newStatusForm").removeClass("show");
+						$("#postMessage").val(lang['postBlank']);
+						$("#newPostForm").removeClass("show");
 						$(".addPost").removeClass("active");
-
 						var newDiv = $("<div>");
 						newDiv.html(data);
 						newDiv.css({"opacity":0.0})
 						$(newDiv).insertAfter(".listFilterContainer")
 										.animate({"opacity":1.0}, 2000);
-						
 						initializeFancybox(newDiv);
 					}
 				});
@@ -669,9 +837,74 @@ $().ready(function() {
 			}
 			else
 			{
-				$("#statusMessage").addClass("error");
+				$("#postMessage").addClass("error");
 			}
 		 return false; 
+		});
+		$("#newPollForm").submit(function() {
+			if ($("#pollQuestion").val() != "" && $("#pollQuestion").val() != lang["pollQuestion"])
+			{
+				var pollQuestion = escape(encodeURIComponent($("#pollQuestion").val()));
+				var pollDescription="";
+				if ($("#pollDescription").val() != "" && $("#pollDescription").val() != lang["pollDescription"])
+				{
+					pollDescription = escape(encodeURIComponent($("#pollDescription").val()));
+				}
+				if ($("#answer1").val()!="")
+				{
+					var answers = "&answer1=" + escape(encodeURIComponent($("#answer1").val()));
+					if ($("#answer2").val()!="")
+					{
+						answers += "&answer2=" + escape(encodeURIComponent($("#answer2").val()));
+						$("#pollAnswers").find("li").each(function(index) {
+							if (index>1 && $("#answer" + parseInt(index+1)).val() != "")
+							{
+								answers += "&answer"+parseInt(index+1)+"="+escape(encodeURIComponent($("#answer" + parseInt(index+1)).val()));
+							}
+						});
+						
+						var dataString = "question=" + pollQuestion + "&description="+ pollDescription + answers;
+						$.ajax({
+							url:"index.php?task=ajaxPost",
+							type:"post",
+							data:dataString,
+							success:function(data){
+								$("#pollQuestion").val(lang['pollQuestion']);
+								$("#newPollForm").removeClass("show");
+								$(".addPost").removeClass("active");
+
+								var newDiv = $("<div>");
+								newDiv.html(data);
+								newDiv.css({"opacity":0.0})
+								$(newDiv).insertAfter(".listFilterContainer")
+												.animate({"opacity":1.0}, 2000);
+
+								initializeFancybox(newDiv);
+							}
+						});
+						return false;
+					}
+					else
+					{
+						$("#answer2").addClass("error");
+					}
+				}
+				else
+				{
+					$("#answer1").addClass("error");
+				}
+			}
+			else
+			{
+				$("#pollQuestion").addClass("error");
+			}
+			return false;
+		});
+		$("input.text").live("keyup click change",function() {
+			$(this).removeClass("error");
+		});
+		$("#pollQuestion").focus(function() {
+			$("#pollDescription").slideDown()
 		});
 		$("#newDiscussForm").submit(function() {
 			//alert("Kein Text eingebeben!");
@@ -710,28 +943,30 @@ $().ready(function() {
 			}
 		 return false; 
 		});
-	$("a.addPost.discuss").live("click", function(e) {
-		if ($(".newPostForm.discuss").is(":visible"))
+	$("a.addPost.poll").live("click", function(e) {
+		if (!$(this).hasClass("disabled"))
 		{
-			$(".newPostForm.discuss").removeClass("show");
-			$(this).removeClass("active");
+			if ($(".newPostForm.poll").is(":visible"))
+			{
+				$(".newPostForm.poll").removeClass("show");
+				$(this).removeClass("active");
+			}
+			else
+			{
+				$(".newPostForm").removeClass("show");
+				$(".newPostForm.poll").addClass("show");
+				$(".addPost").removeClass("active");
+				$(this).addClass("active");
+			}
 		}
-		else
-		{
-			$(".newPostForm").removeClass("show");
-			$(".newPostForm.discuss").addClass("show");
-			$(".addPost").removeClass("active");
-			$(this).addClass("active");
-		}
-		
 		return false;
 	});
-	$("a.addPost.status").live("click", function(e) {
-		if ($(".newPostForm.status").is(":visible"))
+	$("a.addPost.post").live("click", function(e) {
+		if ($(".newPostForm.post").is(":visible"))
 		{
 			if ($(this).hasClass("active"))
 			{
-				$(".newPostForm.status").removeClass("show");
+				$(".newPostForm.post").removeClass("show");
 				$(this).removeClass("active");
 			}
 			else
@@ -743,7 +978,7 @@ $().ready(function() {
 		else
 		{
 			$(".newPostForm").removeClass("show");
-			$(".newPostForm.status").addClass("show");
+			$(".newPostForm.post").addClass("show");
 			$(".addPost").removeClass("active");
 			$(this).addClass("active");
 			$("#statusMessage").focus();
@@ -756,7 +991,14 @@ $().ready(function() {
 	}).live("mouseleave",function(e) {
 		$(this).find(".chatButtonContainer").remove();
 	}).live('dblclick',function() {
-		$(this).find(".chatButtonContainer").find("button.chat.edit").click();
+		if ($(this).find(".chatButtonContainer").find("button.chat.edit").length)
+		{
+			$(this).find(".chatButtonContainer").find("button.chat.edit").click();
+		}
+		else
+		{
+			alert ("error chat button not found!");
+		}
 	});
 	$(".commentContainerWrapper").each(function() {
 		if ($(this).html()!="")
@@ -764,9 +1006,100 @@ $().ready(function() {
 			$(this).show();
 		}
 	});
+	
+	$("#chatUserList").mousewheel(function(e) {
+		scrollDir = -1 * e.originalEvent.wheelDeltaY / 5;
+		$("#chatUserList").scrollTop(scrollDir + $("#chatUserList")[0].scrollTop);
+		return false;
+	});
+	
+	
+	$(".chatContainer").live('mousewheel',function(e) {
+		scrollDir = -1 * e.originalEvent.wheelDeltaY / 10;
+		$(this).find(".messageContainer").scrollTop(scrollDir + $(this).find(".messageContainer")[0].scrollTop);
+		return false;
+	});
+	
+	var answers=3;
+	$("button.addPollAnswer").click(function() {
+		answers += 1;
+		$("button.removePollAnswer").removeClass("disabled").removeAttr("disabled");
+		var html = '<li id="liAnswer'+answers+'">'+
+			'<label class="inset" for="answer'+answers+'">&bull; ' /*+String.fromCharCode(answers+96)*/+ '</label>' +
+		'<input class="inset text" type="text" name="answer'+answers+'" id="answer'+answers+'" value=""/>' + 
+		'</li>';
+
+		$("#pollAnswers").append(html);
+		return false;
+	});
+	$("button.removePollAnswer").click(function() {
+		if (answers>2)
+		{
+			$("#liAnswer" + answers).remove();
+			answers -= 1;
+			
+		}
+		if (answers==2)
+		{
+			$("button.removePollAnswer").addClass("disabled").attr("disabled","disabled");
+		}
+		return false;
+	});
+	$("#answers").live("change click keyup", function() {
+		var answers = parseInt($(this).val());
+		var loops = answers;
+		if (prevAnswers>answers) 
+		{
+			loops = prevAnswers; 
+		}
+		//console.log (prevAnswers + " > " + answers);
+		
+		for (var i = 1; i<=loops; i++)
+		{
+			if (i > prevAnswers)
+			{
+				var html = '<div id="divAnswer'+i+'">'+
+				'<label class="inset" for="answer'+i+'">Antwort '+i+':</label>' + 
+				'<input class="inset text" type="text" name="answer'+i+'" id="answer'+i+'" value=""/>' + 
+				'</div>';
+				
+				$("#pollAnswers").append(html)
+			}
+			else if (i>answers)
+			{
+				$("#divAnswer" + i).remove();
+			}
+		}
+		prevAnswers = answers;
+	});
+	adjustWindowSize();
+	
+	
+	$("a.showPollButton").live("click", function() {
+		var id = parseInt(this.id.substring(14));
+		if ($("#graph" + id).is(":visible"))
+		{
+			$("#graph" + id).find("svg").remove();
+			$("#graph" + id).hide();
+			$(this).html(lang["showPollResults"]);
+		}
+		else
+		{
+			showPollResult(id);
+			$(this).html(lang["hidePollResults"]);
+		}
+	});
+	$("a.nextSlogan").live("click",function() {
+		$.ajax({
+			url:"slogan",
+			success:function(data){
+					$("div.slogan").replaceWith(data);
+				}
+			});
+	});
 });
 function openChat(id)
-{	
+{
 	if ($("#chatWindows").find("#chat_" + id).length==0)
 		{
 			$.ajax({
@@ -775,7 +1108,7 @@ function openChat(id)
 					data:"user=" + id,
 					success:function(data){
 						$("#chatWindows").append(data);
-						var chatWindowObj = ($("#chatWindows").find("#chat_" + id))
+						var chatWindowObj = $("#chatWindows").find("#chat_" + id);	
 						initializeChat(chatWindowObj);
 						//var obj=document.getElementById("messageContainer" + id);
 						scrollDownChatContainerWhenImageLoaded(id);
@@ -821,6 +1154,7 @@ function initializeChat(that)
 	/* @todo: automatisch anpassen
 	 *	an fenstergröße - SICHTBAR!
 	 * */
+	//console.log(that);
 	if (parseInt($(that).attr("id").substring(5))>0)
 	{
 		$.cookie($(that).attr("id"), "open");
@@ -1016,14 +1350,14 @@ var prevData = new Array();
 
 function channel(user)
 {
-	//console.log("shooting CHAT");
-	
+
 	$.ajax({
 		url:"chat",
 		type:"post",
 		data:"receiver=" + user,
 		success:function(data)
 		{
+
 			var escapedData = escape(data);
 			if (prevData[user] != escapedData)
 			{
@@ -1052,7 +1386,7 @@ function channelAll()
 		url:"chat",
 		type:"post",
 		success:function(data)
-		{	
+		{
 			if (parseInt(data)!==-1)
 			{
 				var obj = eval("(" + data + ")");
@@ -1193,12 +1527,12 @@ function calcLikeStats(votingContainer, like, dislike)
 	if (like>0 || dislike>0)
 	{
 		//console.log (like + ":" + dislike);
-		var percent = like/(parseInt(like)+parseInt(dislike))*100;
+		var percent = parseInt(like/(parseInt(like)+parseInt(dislike))*100);
 
 		var width = percent/2;
 		$(votingContainer).find(".votingBar.left").width(width).removeClass("deac").end()
 						   .find("span.percent").text(percent + " %").end()
-						   .attr("title", like + " stimmen zu : " + dislike + " lehnen ab");
+						   .attr("title", dislike + " "+lang['NrDislike']+" : " + like + " " + lang['NrLike']);
 	}
 	else
 	{
@@ -1206,7 +1540,7 @@ function calcLikeStats(votingContainer, like, dislike)
 		var width = 25;
 		$(votingContainer).find(".votingBar.left").width(width).addClass("deac").end()
 						   .find("span.percent").text(percent + " %").end()
-						   .attr("title", like + " stimmen zu : " + dislike + " lehnen ab");
+						   .attr("title", dislike + " "+lang['NrDislike']+" : " + like + " " + lang['NrLike']);
 		
 	}
 }
@@ -1214,6 +1548,7 @@ function calcLikeStats(votingContainer, like, dislike)
 function adjustWindowSize()
 {
 	$(".contentWrapperContainer").width(window.innerWidth - $(".loginFormContainer").width()-64);
+	$("#chatUserList").height(window.innerHeight - 150);
 }
 function scrollToPos(i)
 {	
@@ -1268,6 +1603,155 @@ function scrollDownChatContainerWhenImageLoaded(id)
 }
 function scrollDownContainer(obj)
 {
-	var scrollHeight = obj[0].scrollHeight;
-	obj.scrollTop(scrollHeight);
+	
+	if(obj[0] != undefined)
+	{
+		var scrollHeight = obj[0].scrollHeight;
+		if (scrollHeight)
+		{
+			obj.scrollTop(scrollHeight);
+		}
+	}
+	
+	
 }
+
+	
+Raphael.fn.pieChart = function (cx, cy, r, values, labels, stroke,colorHue,colorSaturation,colorBrightness,colorInterval) {
+	//if (paper) paper.clear();
+	var paper = this,
+		rad = Math.PI / 180,
+		chart = this.set();
+	function sector(cx, cy, r, startAngle, endAngle, params) {
+		var x1 = cx + r * Math.cos(-startAngle * rad),
+			x2 = cx + r * Math.cos(-endAngle * rad),
+			y1 = cy + r * Math.sin(-startAngle * rad),
+			y2 = cy + r * Math.sin(-endAngle * rad);
+		return paper.path(["M", cx, cy, "L", x1, y1, "A", r, r, 0, +(endAngle - startAngle > 180), 0, x2, y2, "z"]).attr(params);
+	}
+
+	//var styleColor = Raphael.rgb2hsb(100,153,153);
+	var angle = 0,
+		total = 0,
+		start = colorHue,
+		brightness=colorBrightness+0.2;//styleColor.b,
+		if (brightness > 1.0)
+		{
+			brightness = 1.0;
+		}
+		var saturation=colorSaturation+0.2;//styleColor.s,
+		if (saturation > 1.0)
+		{
+			saturation = 1.0;
+		}
+		var prevValue = 0;
+		process = function (j) {
+			var value = values[j];
+			if (value >0)
+			{
+				var angleplus;
+				if (total > values[j])
+				{
+					
+					angleplus = (360 * value / total );
+				}
+				else
+				{
+					angleplus = (359 * value / total );
+				}
+				var popangle = angle + (angleplus / 2),
+				color = Raphael.hsb(start, saturation,brightness),
+				ms = 500,
+				delta = 0;
+				if (prevValue == value && value == 0)
+				{
+					popangle += 12;
+				}
+				if (angleplus == 0) angleplus = 1;
+				bcolor = Raphael.hsb(start, saturation, brightness);
+				var fontWeightBold="";
+				var txt,p;
+				if (j==uservote)
+				{
+					var xcolor =Raphael.hsb(start,1.0,0.2);
+					p = sector(cx, cy, r+1, angle, angle + angleplus, {fill:color,stroke:xcolor, "stroke-width": 2});
+					txt = paper.text(cx + (r + delta + 150) * Math.cos(-popangle * rad), cy + (r + delta + 25) * Math.sin(-popangle * rad), labels[j]).attr({fill: "#333333", stroke: "none", opacity: 1,"font-size": 12,"font-weight":"bold","font-family":"Georgia,serif","width":"150px"}); 
+					if (value>0)
+					{
+						label = paper.text(cx + (r + delta - 40) * Math.cos(-popangle * rad), cy + (r + delta - 40) * Math.sin(-popangle * rad), value).attr({fill:"#ffffff" ,opacity: 1,"font-weight":"bold","font-size": 13,"font-family":"Arial,Helvetica,sans-serif"});
+					}
+				}
+				else
+				{
+					p = sector(cx, cy, r, angle, angle + angleplus, {fill: color,stroke: stroke, "stroke-width": 1});
+					txt = paper.text(cx + (r + delta + 150) * Math.cos(-popangle * rad), cy + (r + delta + 25) * Math.sin(-popangle * rad), labels[j]).attr({fill: "#333333", stroke: "none", opacity: 1,"font-size": 12,"font-family":"Georgia,serif","width":"150px"}); 
+					if (value>0)
+					{
+						label = paper.text(cx + (r + delta - 40) * Math.cos(-popangle * rad), cy + (r + delta - 40) * Math.sin(-popangle * rad), value).attr({fill: "#ffffff", stroke: "none", opacity: 1,"font-size": 13,"font-family":"Arial,Helvetica,sans-serif"});
+					}
+				}
+				//brightness += 0.05;
+				//saturation += 0.05;
+				angle += angleplus;
+				chart.push(p);
+				chart.push(txt);
+				//saturation-=.1;
+				prevValue = value;
+			}
+			start+=colorInterval;
+			if (start>1) start = start-1;
+			if (start<0) start = 1+start;
+		};
+	for (var i = 0, ii = values.length; i < ii; i++) {
+		total += values[i];
+	}
+	if (total > 0)
+	{
+		for (i = 0; i < ii; i++) {
+			process(i);
+		}
+	}
+	else
+	{
+		var txt = paper.text(cx, cy, lang["noPollVotes"]).attr({fill: "#999999", stroke: "none", opacity: 1,"font-size": 10,"font-family":"Georgia,serif"}); 
+	}
+	
+	return chart;
+};
+
+
+	var uservote = -1;
+	var values = [],
+		labels = [];
+		
+	function showPollResult(id)
+	{
+		uservote=-1;
+		values[id] = [];
+		labels[id] = [];
+		$("#poll"+id+" tr").each(function (e,i) {
+				values[id].push(parseInt($("td", this).text()));
+				if ($(this).hasClass("uservote"))
+				{
+					uservote = e;
+				}
+				labels[id].push($("th", this).text());
+			});
+		if ($("#graph" + id).find("svg").length > 0)
+		{
+			$("#graph" + id).find("svg").remove();
+
+		}
+		
+		var width = $(".contentWrapperContainer").width();
+		
+		
+		$("#graph" + id).show();
+		
+		var color = Raphael.color(styleColor),
+		hue = color.h,
+		sat = color.s,
+		bri = color.l;
+		Raphael("graph"+id,width,250).pieChart(width/2, 120, 80, values[id], labels[id], "#fff", hue, sat,bri, -0.22);
+		$("#showPollButton" + id).html(lang['hidePollResults']);
+	}

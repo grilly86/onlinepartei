@@ -53,14 +53,31 @@
 	}
 
 	function makeLinks ($htmlText) {
-
-		$htmlText = str_replace("http://www.","www.",$htmlText);
+		$htmlText = str_replace(array("http://www.","https://www."),"www.",$htmlText);
 		$htmlText = str_replace("www.","http://www.",$htmlText);
+		$htmlText = $this->parseUbb($htmlText);
 		$htmlText = $this->convertPost($htmlText);
 		$htmlText = nl2br($htmlText);
 		return $htmlText;
 	}
 
+	function parseUbb ($str)
+	{
+		//$str=str_replace("[hr]","<hr size=\"1\" noshade>",$str);
+		$str=preg_replace("/\[b\](.*?)\[\/b\]/si","<b>\\1</b>",$str);
+		$str=preg_replace("/\[i\](.*?)\[\/i\]/si","<i>\\1</i>",$str);
+		$str=preg_replace("/\[u\](.*?)\[\/u\]/si","<u>\\1</u>",$str);
+		$str=preg_replace("/\[-\](.*?)\[\/-\]/si","<span class=\"strikethrough\">\\1</span>",$str);
+		//$str=preg_replace("/\[cn\](.*?)\[\/cn\]/si","<center>\\1</center>",$str);
+		$str=preg_replace("/\[bq\](.*?)\[\/bq\]/si","<blockquote>\\1</blockquote>",$str);
+		//$str=preg_replace("/\[img=(.*?)\]/si","<img src=\"\\1\" border=\"0\">",$str);
+		//$str=preg_replace("/\[img\](.*?)\[\/img\]/si","<img src=\"\\1\" border=\"0\">",$str);
+		$str=preg_replace("/\[url=(.*?)\](.*?)\[\/url\]/si","<a href=\"\\1\" target=\"_blank\">\\2</a>",$str);
+		$str=preg_replace("/\[quote](.*?)\[\/quote\]/si","<blockquote>\\1</blockquote>",$str);
+		//$str=preg_replace("/\[quote=(.*?)\](.*?)\[\/quote\]/si","<blockquote><i><b>Originally posted by \\1:</b><br>\\2</i></blockquote>",$str);
+		return $str;
+	}
+	
 	function convertPost($post)
 	{ // Disclaimer: This "URL plucking" regex is far from ideal.
 		$pattern = '`((?:https?|ftp)://\S+[[:alnum:]]/?)`si';
@@ -82,19 +99,18 @@ function _handle_URL_callback($matches)
 { // preg_replace_callback() is passed one parameter: $matches.
 	if (preg_match('/\.(?:jpe?g|png|gif)(?:$|[?#])/', $matches[0]))
 	{ // This is an image if path ends in .GIF, .PNG, .JPG or .JPEG.
-		
 		return '<div class="imageWrapperContainer"><a class="fancybox" target="_blank" href="' . $matches[0] . '"><img class="thumbnail" ref="'. $matches[0] .'"></a></div>';
 	} // Otherwise handle as NOT an image.
-	if(preg_match('/http:\/\/www\.youtube\.com\/watch\?v=[^&]+/', $matches[0], $xMatches)) {
-	$type= 'youtube';
-	if (preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#", $matches[0], $xMatches))
-		{
-			$videoID = $xMatches[0];
-			$html = '<div class="videoLink" style="background:url(http://img.youtube.com/vi/'.$xMatches[0].'/default.jpg) no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span>'.$matches[0].'</a></div>';
+	//if(preg_match('/http:\/\/www\.youtube\.com\/watch\?v=[^&]+/', $matches[0], $xMatches)) {
+		
+		if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $matches[0], $xMatches))
+		{	
+			$type= 'youtube';
+			$videoID = $xMatches[1];
+			$html = '<div class="videoLink" style="background:url(http://img.youtube.com/vi/'.$xMatches[1].'/default.jpg) no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span>'.$matches[0].'</a></div>';
 			return $html; //"<a class='youtube' href='http://www.youtube.com/watch/?v=" . $xMatches[0] . "'>" . $xMatches[0] . "</a>";
 		}
-	}
+	//}
 	return '<a target="_blank" href="'. $matches[0] .'">'. $matches[0] .'</a>';
-		
-	}	
-	?>
+}
+?>

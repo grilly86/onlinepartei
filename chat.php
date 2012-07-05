@@ -1,6 +1,7 @@
 <?php
 		session_start();
-		require "static/jsonwrapper/jsonwrapper.php";
+		include  "static/jsonwrapper/jsonwrapper.php";
+		
 		$task="";
 		if (isset($_REQUEST["task"]))
 		{
@@ -40,7 +41,7 @@
 						$smarty->assign("user",$user); 
 					}
 					
-					$smarty->display("chat.html");
+					$smarty->display("chat/chat.tpl");
 					break;
 				case "message":
 						if (isset($_REQUEST["message"]) && isset($_REQUEST["receiver"]))
@@ -57,6 +58,7 @@
 				default:
 					if(isset($_REQUEST["receiver"]))
 					{
+
 						include_once "lib/lang/lang.php";
 						$l = "de";
 						if (isset($user["language"]) && $user["language"]=="en")
@@ -65,7 +67,7 @@
 						}
 						$lang = new Language($l);
 						$receiver = (int)$_REQUEST["receiver"];
-						$sql = "SELECT message.id, message.message,message.timestamp,receiver.name as receivername, sender.name as username, message.senderID as senderid,message.receiverID as receiverid FROM message, user as sender, user as receiver WHERE senderID=sender.id AND receiverID=receiver.id AND (senderID=" . $user["id"] . " OR receiverID=" . $user["id"] . ") AND (" . 
+						$sql = "SELECT message.id, message.message,message.timestamp,receiver.name as receivername, sender.name as username, message.senderID as senderid,message.receiverID as receiverid,sender.hasImage as senderHasImage, receiver.hasImage as receiverHasImage FROM message, user as sender, user as receiver WHERE senderID=sender.id AND receiverID=receiver.id AND (senderID=" . $user["id"] . " OR receiverID=" . $user["id"] . ") AND (" . 
 													 " senderID=" . $receiver . " OR receiverID=" . $receiver . ") AND message.timestamp>'".date('Y-m-d', time() - 2592000)." 00:00:00' ORDER BY timestamp"; 
 						$rs = mysql_query($sql) or die(mysql_error());
 						$obj=array();
@@ -82,7 +84,7 @@
 						$rs = mysql_query($sql) or die(mysql_error());
 						$smarty->assign("user",$user);
 						$smarty->assign("chat", $obj);
-						die(str_replace("<br />", "<br>", $smarty->fetch("chat/message.html")));
+						die(str_replace("<br />", "<br>", $smarty->fetch("chat/message.tpl")));
 					}
 					else
 					{
@@ -107,6 +109,7 @@
 									"ORDER BY online DESC, user.name ASC";
 						//echo $sql . "<br>";
 						$rs=mysql_query($sql); //or die mysql_error(s);
+						$userList=array();
 						while ($row=mysql_fetch_assoc($rs)) 
 						{							
 							$row["readableOnline"] = $util->makeDateReadable($row["online"],true);
@@ -115,8 +118,8 @@
 						}
 						//print_r ($userList);	
 						$smarty->assign("userList", $userList);
-						$userList = $smarty->fetch("chat/userlist.html");
 						
+						$userList = $smarty->fetch("chat/userlist.tpl");
 						//query
 						$sql = "SELECT COUNT(message.message) as messageCount, sender.id as senderid,receiver.name as receivername, sender.name as username FROM message,user as sender, user as receiver WHERE senderID=sender.id AND receiverID=receiver.id AND (receiverID=" . $user["id"] . ") AND message.read=0 GROUP BY sender.id ORDER BY timestamp"; 
 						$rs = mysql_query($sql) or die(mysql_error());
@@ -125,8 +128,7 @@
 						{
 							$obj[] = array("senderid"=>$row["senderid"],"messageCount"=>$row["messageCount"]);
 						}
-						
-						$obj = array("obj"=>$obj, "userList"=>$userList);
+						$obj = array("obj"=>$obj, "userList"=>utf8_encode($userList));
 						if ($obj)
 						{
 							die(json_encode($obj));

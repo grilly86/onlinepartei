@@ -1,9 +1,10 @@
 <?php
 
-define("SALT", "t0ps3cr3ts4ltk3y");
+define("SALT", "s4lt");
 
 class Config
 {
+	
 	var $mysqlServer="";
 	var $mysqlDatabase="";
 	var $mysqlUser="";
@@ -49,12 +50,14 @@ class Config
 	}
 	function convertToDatabase($str)
 	{
+		$str = str_replace(array("<",">"),array("&lt;","&gt;"),$str);
 		$str = utf8_decode(addslashes($str));
 		return $str;
 	}
 	function convertFromDatabase($str)
 	{
 		$str = urldecode(utf8_encode($str));
+		$str = str_replace(array("<",">"),array("&lt;","&gt;"),$str);
 		return stripslashes($str);
 	}
 
