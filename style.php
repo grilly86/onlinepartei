@@ -26,6 +26,10 @@
 				$color = $row["color"];
 				
 			}
+			elseif (isset($_COOKIE['styleColor']))
+			{
+				$color = $_COOKIE["styleColor"];
+			}
 			else
 			{
 				//zufällige farbe generieren (nicht zu hell!)
@@ -52,6 +56,8 @@
 				$b = str_pad(dechex($b), 2, "0", STR_PAD_LEFT);
 				
 				$color = "#" . $r . $g . $b;
+				 
+				//$color = "#555555";
 			}
 			$smarty->assign("userID", $userID);
 			$smarty->assign("styleColor", $color);

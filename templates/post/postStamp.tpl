@@ -1,7 +1,7 @@
 <div class="postStamp">
 	<a class="anchor" href="p{if $item.type=='poll'}oll{/if}{$item.id}">{$item.date}</a>
 	{$lang.by}
-	<a class="postUser" href="u{$item.userid}">
+	<a class="postUser styleColor" href="u{$item.userid}">
 		<img src="uploads/p/{if $item.hasImage}{$item.userid}{else}0{/if}.jpg" class="profileImage post">
 		{if $item.username}
 			{$item.username}

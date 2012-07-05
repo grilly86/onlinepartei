@@ -6,7 +6,7 @@
 			{include file='post/postFooter.tpl'}
 		</div>
 {else}
-<h2><a href="poll{$item.id}">{$item.caption|@urldecode|@stripslashes}</a></h2>
+<h2><a href="poll{$item.id}" class="styleColor">{$item.caption|@urldecode|@stripslashes}</a></h2>
 	<p style="margin-left:10px">{$item.message|@urldecode|@stripslashes}</p>
 	{if $loggedIn}
 		<form class="pollVoteForm" id="pollForm{$item.id}"name="pollForm{$item.id}" method="post">

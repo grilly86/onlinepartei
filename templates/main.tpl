@@ -32,7 +32,7 @@
 	<body>
 		<div id="contextMenuContainer"></div>
 		<div id="soundPlayer"></div>
-		<div class="menuContainer">
+		<div class="menuContainer styleColorBackground">
 			<a href="./" class="logo qtipTitle tooltipLeft" title="onlinepartei.eu"></a>
 			<span class="headerText">
 				<h2>onlinepartei.eu</h2>
@@ -49,18 +49,80 @@
 						<img class="profileImage" src="uploads/p/{$user.id}.jpg" alt="" height="36"/>
 						{/if}
 						<a class="username" href="u{$user.id}">{$user.name}</a>
-						<a href="logout" class="titleButton logout qtipTitle tooltipRight" title="{$lang.logout}"></a>
+						<a href="logout" class="titleButton logout qtipTitle tooltipRight styleColorBackground" title="{$lang.logout}"></a>
 					</div>
 				<a href="settings" class="menuButton settings qtipTitle {$settingsActive}" title="{$lang.settings}"></a>
 				{/if}
+				
+				
 				<a href="polls" class="menuButton polls qtipTitle {$pollsActive}" title="{$lang.polls}"></a>
 				<a href="./" class="menuButton posts qtipTitle {$postsActive}" title="{$lang.posts}"></a>
-				
+			
+				{if !$loggedIn}
+				<div style="float:right;position:relative;margin-right:24px;">
+					{$styleColor}
+					<input id="colorPickerInput" value="{$styleColor}" style="background:{$styleColor}" /><span class="colorPickerDice"></span>
+					<div id="colorPicker" style="margin-top:30px;margin-left:-50px;"></div>
+				</div>
+				{literal}
+					<script type="text/javascript" src="static/script/farbtastic/farbtastic.js"></script>
+					<script type="text/javascript">
+						$().ready(function() {
+							styleColor = colorToHex($(".menuContainer").css("background-color"));
+							if ($.cookie("styleColor"))
+							{
+								styleColor = $.cookie("styleColor");
+							}
+							$("#colorPickerInput").keyup(function(e) {
+								if (e.keyCode == 13 || e.keyCode == 27)
+								{
+									e.preventDefault();
+									$(this).blur();
+								}
+								var x = /^#[0-9a-f]{6}$/i.exec(this.value);
+								if (x)
+								{
+									if (x[0] != styleColor)
+									{
+										styleColor = x[0];
+										colorPicker.setColor(styleColor);
+									}
+								}
+							});
+							$("#colorPickerInput").val(styleColor).css("background-color",styleColor);
+							var colorPicker = $.farbtastic('#colorPicker');
+								colorPicker.linkTo(pickerUpdate);
+								colorPicker.setColor(styleColor);
+									function pickerUpdate(color)
+									{
+										$('#colorPickerInput').css({'background-color':color}).val(color);
+										setStyleColor(color);
+									}
+								$("#colorPickerInput").focus(function() {
+									$("#colorPicker").fadeIn();
+								}).blur(function() {
+									$("#colorPicker").fadeOut();
+									var x = /^#[0-9a-f]{6}$/i.exec(this.value);
+									if (!x)	{
+										this.value = styleColor;
+									}
+									$.cookie("styleColor", this.value);
+								});
+								$(".colorPickerDice").click(function() {
+									color = generateRandomColor();
+									$("#colorPickerInput").css({'background-color':color}).val(color);
+									setStyleColor(color);
+									$.cookie('styleColor', '', { expires: -1 })
+								});
+						});
+					</script>
+				{/literal}
+				{/if}
 		</div>
 		<div class="sidebarContainer">
 		{if $loggedIn}
-			<div class="loginFormContainer">
-			<div class="titleContainer">
+			<div class="loginFormContainer styleColorBorder">
+			<div class="titleContainer styleColorBackground">
 				<span class="mailIcon"></span>
 				{*<select name="userList" class="selectUserList">
 					<option value="0" selected="selected">Alle</option>
@@ -80,12 +142,12 @@
 				{/foreach}
 			</div>
 		</div>
-		<button class="soundButton on" title="{$lang.muteSound}"></button>
+		<button class="soundButton on styleColorBackground" title="{$lang.muteSound}"></button>
 		
 		{else}
 		<div style="float:right">
-			<div class="loginFormContainer">
-				<div class="titleContainer"><span class="loginIcon"></span>{$lang.login}</div>
+			<div class="loginFormContainer styleColorBorder">
+				<div class="titleContainer styleColorBackground"><span class="loginIcon"></span>{$lang.login}</div>
 				<form id="loginForm" class="loginForm" method="post" action="index.php?task=login">
 					<div id="loginErrorContainer" class="errorContainer">
 					{if $loginError}
@@ -99,8 +161,8 @@
 				<br clear="right"/>
 				<br clear="right"/>
 			</div>
-			<div class="loginFormContainer">
-				<div class="titleContainer"><span class="registerIcon"></span>{$lang.register}</div>
+			<div class="loginFormContainer styleColorBorder">
+				<div class="titleContainer styleColorBackground"><span class="registerIcon"></span>{$lang.register}</div>
 				<form id="registerForm" class="loginForm" method="post" action="index.php?task=register">
 					<div id="registerErrorContainer" class="errorContainer">
 					{if $registerError}
@@ -175,7 +237,7 @@
 		</div>
 		{/if}
 		<br />
-		<a href="impressum.html">{$lang.imprint}</a>
+		<a href="impressum.html" class="styleColor">{$lang.imprint}</a>
 		</div>
 		
 		{$contents}

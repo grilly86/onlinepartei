@@ -1,9 +1,9 @@
 		<div class="contentWrapperContainer">
-			<div class="contentTitleContainer">
+			<div class="contentTitleContainer styleColorBackground">
 				{$lang.settingsFor} {$user.name}
 			</div>
-			<div class="contentContainer postContainer">
-				<h1>{$lang.profile}</h1>
+			<div class="contentContainer postContainer styleColorBorder">
+				<h1 class="styleColor">{$lang.profile}</h1>
 				<form name="profile" method="post" action="index.php?task=settings" enctype="multipart/form-data">
 					<div>
 						<label for="nickname">
@@ -27,9 +27,12 @@
 						</select>
 					</div>
 					<div>
+						
 						<label for="colorPickerInput">Farbe:</label>
-						<input type="text" class="text" id="colorPickerInput" name="color" value="{$user.color}" />
-						<div id="colorPicker"></div>
+						<div style="position:relative;float:left;clear:none">
+							<input type="text" class="text" id="colorPickerInput" name="color" value="{$user.color}" /><span class="colorPickerDice"></span>
+							<div id="colorPicker"></div>
+						</div>
 						{*<span><strong>Hinweis: </strong>F&uuml;r optimale Lesbarkeit wird ein <strong>dunkler Farbwert</strong> empfohlen!</span></div>*}
 					</div>
 					<div>
@@ -67,7 +70,7 @@
 						
 					</fieldset>
 					<br clear="left" />
-					<input class="submit" type="submit" value="{$lang.save}" />
+					<input class="submit styleColorBackground" type="submit" value="{$lang.save}" />
 					<br clear="left" />
 					<br clear="left" />
 				</form>
@@ -247,36 +250,48 @@
 	$().ready(function() {
 		$('#colorPicker').farbtastic("#colorPickerInput");
 			
-			$("#colorPickerInput").focus(function() {
-				$("#colorPicker").fadeIn();
-			}).blur(function() {
-				$("#colorPicker").fadeOut();
-			});
-				
+		$("#colorPickerInput").keyup(function(e) {
+			
+			if (e.keyCode == 13 || e.keyCode == 27)
+			{
+				e.preventDefault();
+				$(this).blur();
+			}
+			var x = /^#[0-9a-f]{6}$/i.exec(this.value);
+			if (x)
+			{
+				if (x[0] != styleColor) {
+					styleColor = x[0];
+					colorPicker.setColor(styleColor);
+				}
+			}
+		});
+		styleColor = $('#colorPickerInput').val();
+		var colorPicker = $.farbtastic('#colorPicker');
+		colorPicker.linkTo(pickerUpdate);
+		colorPicker.setColor(styleColor);
+		function pickerUpdate(color)
+		{
+			$('#colorPickerInput').css({'background-color':color}).val(color);
+			setStyleColor(color);
+		}
+		$("#colorPickerInput").focus(function() {
+			$("#colorPicker").fadeIn();
+		}).blur(function() {
+			$("#colorPicker").fadeOut();
+			var x = /^#[0-9a-f]{6}$/i.exec(this.value);
+			if (!x)	{
+				this.value = styleColor;
+			}
+			$.cookie("styleColor", this.value);
+		});
+		$(".colorPickerDice").click(function() {
+			color = generateRandomColor();
+			$("#colorPickerInput").css({'background-color':color}).val(color);
+
+			setStyleColor(color);
+			$.cookie('styleColor', '', { expires: -1 })
+		});
 	});
-	
 </script>
 {/literal}
-{*<script type="text/javascript" src="static/script/modcoder_excolor/jquery.modcoder.excolor.js"></script>
-<script type="text/javascript">
-	$().ready(function() {
-		
-		$('#colorPicker').modcoder_excolor({
-		   hue_slider : 75,
-		   sb_slider : 1,
-		   border_color : '#6e6e6e',
-		   sb_border_color : '#b3b3b3',
-		   round_corners : true,
-		   shadow : false,
-		   backbrground_color : '#dedede',
-		   backlight : false,
-		   label_color : '#757575',
-		   effect : 'fade',
-		   speed:'fast',
-		   callback_on_ok : function() {
-			  // You can insert your code here 
-		   }
-		});
-		
-	});
-</script>*}

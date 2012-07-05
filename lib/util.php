@@ -72,7 +72,7 @@
 		$str=preg_replace("/\[bq\](.*?)\[\/bq\]/si","<blockquote>\\1</blockquote>",$str);
 		//$str=preg_replace("/\[img=(.*?)\]/si","<img src=\"\\1\" border=\"0\">",$str);
 		//$str=preg_replace("/\[img\](.*?)\[\/img\]/si","<img src=\"\\1\" border=\"0\">",$str);
-		$str=preg_replace("/\[url=(.*?)\](.*?)\[\/url\]/si","<a href=\"\\1\" target=\"_blank\">\\2</a>",$str);
+		$str=preg_replace("/\[url=(.*?)\](.*?)\[\/url\]/si","<a href=\"\\1\" target=\"_blank\" class=\"styleColor\">\\2</a>",$str);
 		$str=preg_replace("/\[quote](.*?)\[\/quote\]/si","<blockquote>\\1</blockquote>",$str);
 		//$str=preg_replace("/\[quote=(.*?)\](.*?)\[\/quote\]/si","<blockquote><i><b>Originally posted by \\1:</b><br>\\2</i></blockquote>",$str);
 		return $str;
@@ -111,6 +111,6 @@ function _handle_URL_callback($matches)
 			return $html; //"<a class='youtube' href='http://www.youtube.com/watch/?v=" . $xMatches[0] . "'>" . $xMatches[0] . "</a>";
 		}
 	//}
-	return '<a target="_blank" href="'. $matches[0] .'">'. $matches[0] .'</a>';
+	return '<a target="_blank" class="styleColor" href="'. $matches[0] .'">'. $matches[0] .'</a>';
 }
 ?>

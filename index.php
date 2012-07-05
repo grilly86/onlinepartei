@@ -4,7 +4,7 @@
 	include_once 'lib/config.php';
 	$workspace = new Workspace();
 	$workspace->process();
-	error_reporting(E_ALL);
+	//error_reporting(E_ALL);
 	class Workspace
 	{
 			var $task="";
@@ -521,7 +521,13 @@
 										{
 											$nickname = addslashes(strip_tags($_POST["username"]));
 
-											$sql = "INSERT INTO user (email,active,color,name) VALUES ('".$_POST["email"]."',1,'#666666','".$nickname."')";
+											$color = "#666666";
+											if (isset($_COOKIE["styleColor"]) && preg_match('/^#[a-f0-9]{6}$/i', $_COOKIE["styleColor"]))
+											{
+												$color = $_COOKIE["styleColor"];
+											}
+											
+											$sql = "INSERT INTO user (email,active,color,name) VALUES ('".$_POST["email"]."',1,'".$color."','".$nickname."')";
 											$rs = mysql_query($sql) or die(mysql_error());
 											$userID = mysql_insert_id();
 											$md5 = md5($userID . SALT . $_POST["password"]);
@@ -925,6 +931,7 @@
 							$rs = mysql_query($sql) or die (mysql_error());
 							if ($rs)
 							{
+								$userList = array();
 								while ($row=mysql_fetch_assoc($rs)) {
 
 									//echo $row["online"];
@@ -932,7 +939,6 @@
 									$row["online"]=strtotime($row["online"]);
 									$userList[]=$row;
 								}
-								//print_r ($userList);	
 								$this->smarty->assign("userList", $userList);
 							}
 						}
@@ -950,7 +956,7 @@
 					}
 					else
 					{
-						$this->smarty->assign("styleColor", "#33cc33");
+						$this->smarty->assign("styleColor", "");
 					}
 					$this->smarty->assign("loggedIn", (int)$loggedIn);
 					$this->smarty->assign("user", $this->user);
@@ -969,8 +975,11 @@
 	function getRandomSlogan()
 	{						
 		$obj = $this->getPostList("tag.name='slogan'","RAND()","1","both");
-		$this->smarty->assign("slogan", $obj[0]);
-		return $this->smarty->fetch("slogan.tpl");
+		if ($obj)
+		{
+			$this->smarty->assign("slogan", $obj[0]);
+			return $this->smarty->fetch("slogan.tpl");
+		}
 	}
 	
 	function getPostList($sqlWhere='',$order="timestamp DESC", $limit='', $type='')

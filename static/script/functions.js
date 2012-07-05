@@ -48,19 +48,10 @@ function getPosts(limit,order,parent)
 			{
 				scrolledToEnd = true;
 			}
-			
-			//console.log("returned: " + limit);
-			
-			//var vorher = $(".contentWrapperContainer").find(".postContainer").length;
-			
 			$(".contentWrapperContainer").append(data).removeClass("loading");
-			
-			//var nachher = $(".contentWrapperContainer").find(".postContainer").length;
-			
-			//console.log("vorher: " + vorher + " | nachher: " + nachher);
+			setStyleColor(styleColor);
 			initializeFancybox($(".contentWrapperContainer"));
 			initializeTooltips();
-			//window.onscroll=undefined;
 		}
 	});
 }
@@ -477,7 +468,7 @@ $().ready(function() {
 			{
 				var obj = this;
 				$(this).parent().parent().find(".commentContainerWrapper:eq(0)").slideUp(300, function() {
-					$(obj).removeClass("active");
+					$(obj).removeClass("active styleColorBackground").addClass("styleColor");
 				});
 			}
 			else
@@ -496,7 +487,7 @@ $().ready(function() {
 					data:dataString,
 					success:function(data) {
 
-						$(that).addClass("active");
+						$(that).addClass("active styleColorBackground").removeClass("styleColor");
 						var wrapper = $(that).parent().parent().find(".commentContainerWrapper");
 						$(wrapper).html(data).slideDown(500,"linear", function() {
 							//animation complete (height final)
@@ -692,7 +683,7 @@ $().ready(function() {
 		
 		var id = parseInt(this.id.substr(9));
 		// todo create DOM elements
-		var contextMenu = "<div class='contextMenu'><a href='javascript:openChat("+id+");'><strong>"+lang["openChat"]+"</strong></a><a href='u"+id+"'>"+lang["showProfile"]+"</a></div>";
+		var contextMenu = "<div class='contextMenu styleColorBorder' style='border-color:"+styleColor+"'><a href='javascript:openChat("+id+");' style='color:"+styleColor+"'><strong>"+lang["openChat"]+"</strong></a><a href='u"+id+"' style='color:"+styleColor+"'>"+lang["showProfile"]+"</a></div>";
 		$("#contextMenuContainer").html(contextMenu);
 		if ($(".contextMenu").length>0)
 		{
@@ -986,7 +977,7 @@ $().ready(function() {
 		return false;
 	});
 	$(".commentContainer.message.edit").live("mouseenter" , function() {
-		var html = '<div class="chatButtonContainer"><button class="chat edit"></button><button class="chat delete"></button></div>'
+		var html = '<div class="chatButtonContainer"><button class="chat edit styleColorBackground" style="background-color:'+styleColor+';border-color:'+styleColor+'"></button><button class="chat delete"></button></div>'
 		$(this).append(html);
 	}).live("mouseleave",function(e) {
 		$(this).find(".chatButtonContainer").remove();
@@ -1008,14 +999,16 @@ $().ready(function() {
 	});
 	
 	$("#chatUserList").mousewheel(function(e) {
-		scrollDir = -1 * e.originalEvent.wheelDeltaY / 5;
+		scrollDir = -1 * e.originalEvent.wheelDeltaY / 5;	//webkit
+		if (!scrollDir) scrollDir = e.originalEvent.detail * 5;	// firefox
 		$("#chatUserList").scrollTop(scrollDir + $("#chatUserList")[0].scrollTop);
 		return false;
 	});
 	
 	
 	$(".chatContainer").live('mousewheel',function(e) {
-		scrollDir = -1 * e.originalEvent.wheelDeltaY / 10;
+		scrollDir = -1 * e.originalEvent.wheelDeltaY / 10;	//webkit
+		if (!scrollDir) scrollDir = e.originalEvent.detail * 10;	// firefox
 		$(this).find(".messageContainer").scrollTop(scrollDir + $(this).find(".messageContainer")[0].scrollTop);
 		return false;
 	});
@@ -1350,14 +1343,12 @@ var prevData = new Array();
 
 function channel(user)
 {
-
 	$.ajax({
 		url:"chat",
 		type:"post",
 		data:"receiver=" + user,
 		success:function(data)
 		{
-
 			var escapedData = escape(data);
 			if (prevData[user] != escapedData)
 			{
@@ -1603,13 +1594,12 @@ function scrollDownChatContainerWhenImageLoaded(id)
 }
 function scrollDownContainer(obj)
 {
-	
 	if(obj[0] != undefined)
 	{
 		var scrollHeight = obj[0].scrollHeight;
 		if (scrollHeight)
 		{
-			obj.scrollTop(scrollHeight);
+			obj.scrollTop(scrollHeight+20);
 		}
 	}
 	
@@ -1720,38 +1710,111 @@ Raphael.fn.pieChart = function (cx, cy, r, values, labels, stroke,colorHue,color
 };
 
 
-	var uservote = -1;
-	var values = [],
-		labels = [];
-		
-	function showPollResult(id)
-	{
-		uservote=-1;
-		values[id] = [];
-		labels[id] = [];
-		$("#poll"+id+" tr").each(function (e,i) {
-				values[id].push(parseInt($("td", this).text()));
-				if ($(this).hasClass("uservote"))
-				{
-					uservote = e;
-				}
-				labels[id].push($("th", this).text());
-			});
-		if ($("#graph" + id).find("svg").length > 0)
-		{
-			$("#graph" + id).find("svg").remove();
+var uservote = -1;
+var values = [],
+	labels = [];
 
-		}
-		
-		var width = $(".contentWrapperContainer").width();
-		
-		
-		$("#graph" + id).show();
-		
-		var color = Raphael.color(styleColor),
-		hue = color.h,
-		sat = color.s,
-		bri = color.l;
-		Raphael("graph"+id,width,250).pieChart(width/2, 120, 80, values[id], labels[id], "#fff", hue, sat,bri, -0.22);
-		$("#showPollButton" + id).html(lang['hidePollResults']);
+function showPollResult(id)
+{
+	uservote=-1;
+	values[id] = [];
+	labels[id] = [];
+	$("#poll"+id+" tr").each(function (e,i) {
+			values[id].push(parseInt($("td", this).text()));
+			if ($(this).hasClass("uservote"))
+			{
+				uservote = e;
+			}
+			labels[id].push($("th", this).text());
+		});
+	if ($("#graph" + id).find("svg").length > 0)
+	{
+		$("#graph" + id).find("svg").remove();
+
 	}
+
+	var width = $(".contentWrapperContainer").width();
+
+
+	$("#graph" + id).show();
+
+	var color = Raphael.color(styleColor),
+	hue = color.h,
+	sat = color.s,
+	bri = color.l;
+	Raphael("graph"+id,width,250).pieChart(width/2, 120, 80, values[id], labels[id], "#fff", hue, sat,bri, -0.22);
+	$("#showPollButton" + id).html(lang['hidePollResults']);
+}
+var styleColor;
+function setStyleColor(color)
+{ 
+	if (color)
+	{
+		styleColor = color;
+		$(".styleColorBorder").css("border-color", color);
+		$(".styleColorBorderTop").css("border-color-top", color);
+		$(".styleColorBorderBottom").css("border-color-bottom", color);
+		$(".styleColorBackground").css("background-color", color);
+		$(".styleColor").css("color", color);
+	}
+}
+function colorToHex( c ) {
+	var m = /rgba?\((\d+), (\d+), (\d+)/.exec( c );
+
+	return m
+	? '#' + ( toHex(m[1])+toHex(m[2])+toHex(m[3]))
+	: c;
+};
+
+function toHex(n) {
+	n = parseInt(n,10);
+	if (isNaN(n)) return "00";
+	n = Math.max(0,Math.min(n,255));
+	return "0123456789ABCDEF".charAt((n-n%16)/16)
+		+ "0123456789ABCDEF".charAt(n%16);
+}
+function generateRandomColor()
+{
+	var $r = rand(0,150);
+	var $b;var $g;
+	if ($r > 100)
+	{
+		$g = rand(0,50);
+	}
+	else
+	{
+		$g = rand(0,150);
+	}
+	if (($r+$g) > 100)
+	{
+		$b = rand(0,50);
+	}
+	else
+	{
+		$b = rand(0,150);
+	}
+
+	$r = toHex($r);
+	$g = toHex($g);
+	$b = toHex($b);
+
+	return "#" + $r + $g + $b;
+}
+function rand(min,max) {
+	if(min > max) {
+		return -1;
+	}
+
+	if(min == max) {
+		return min;
+	}
+
+	var r;
+
+	do {
+		r = Math.random();
+	}
+	while(r == 1.0);
+
+	return min + parseInt(r * (max-min+1));
+}

@@ -1,5 +1,5 @@
-<div class="chatContainer" id="chat_{$user.id}">
-	<div class="chatTitleContainer">
+<div class="chatContainer styleColorBorder" id="chat_{$user.id}">
+	<div class="chatTitleContainer styleColorBackground">
 		{if $user.name}{$user.name}{else}{$lang.noUsername}{/if}
 		<a href="javascript:void(0);" class="chatButton close tooltipRight" title="{$lang.closeChat}"></a>
 		{*<a href="javascript:void(0);" class="chatButton minify"></a>*}

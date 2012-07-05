@@ -1,20 +1,20 @@
 <div class="contentWrapperContainer">
 	{if $loggedIn}
 	<div class="contentToolbarContainer">
-	<a class="addPost post {$postActive} qtipTitle tooltipLeft" href="javascript:void(0);" title="{$lang.postTooltip}">{$lang.newPost}</a>
-	<a class="addPost poll {$pollsActive} qtipTitle" href="javascript:void(0);" title="{$lang.pollTooltip}">{$lang.newPoll}</a>
+	<a class="addPost post {$postActive} qtipTitle tooltipLeft styleColor" href="javascript:void(0);" title="{$lang.postTooltip}">{$lang.newPost}</a>
+	<a class="addPost poll {$pollsActive} qtipTitle styleColor" href="javascript:void(0);" title="{$lang.pollTooltip}">{$lang.newPoll}</a>
 	<br clear="left" />
-		<form class="newPostForm post {if $postActive}show{/if}" name="newStatusForm" id="newPostForm" method="post">
-			<span class="addPostArrow status"></span>
-			<input type="text" class="text empty bold" name="caption" id="postCaption" />
-			<textarea id="postMessage" class="text message empty" name="status"></textarea>
+		<form class="newPostForm post {if $postActive}show{/if} styleColorBorder" name="newStatusForm" id="newPostForm" method="post">
+			<span class="addPostArrow status styleColorBackground"></span>
+			<input type="text" class="text empty bold styleColorBorder" name="caption" id="postCaption" />
+			<textarea id="postMessage" class="text message empty styleColorBorder" name="status"></textarea>
 			<br clear="left" />
-			<input type="submit" class="submit" value="{$lang.send}" />
+			<input type="submit" class="submit styleColorBackground styleColorBorder" value="{$lang.send}" />
 			<span class="resizeHandleVertical"></span>
 			<input type="hidden" name="isUserReal" />
 		</form>
-		<form class="newPostForm poll {if $pollsActive}show{/if}" name="newPollForm" id="newPollForm" method="post">
-			<span class="addPostArrow poll"></span>
+		<form class="newPostForm poll {if $pollsActive}show{/if} styleColorBorder" name="newPollForm" id="newPollForm" method="post">
+			<span class="addPostArrow poll styleColorBackground"></span>
 			<input type="text" class="text empty bold" name="question" id="pollQuestion" />
 			<textarea id="pollDescription" class="text message empty" name="description" style="display:none"></textarea>
 			<br clear="left" />
@@ -33,9 +33,9 @@
 				</li>
 				
 			</ol>
-			<button class="removePollAnswer">&minus; Antwortmöglichkeit entfernen</button>
-			<button class="addPollAnswer">&plus; Antwortmöglichkeit hinzufügen</button>
-			<input type="submit" class="submit show" value="{$lang.send}" />
+			<button class="removePollAnswer styleColorBackground">&minus; Antwortmöglichkeit entfernen</button>
+			<button class="addPollAnswer styleColorBackground">&plus; Antwortmöglichkeit hinzufügen</button>
+			<input type="submit" class="submit show styleColorBackground" value="{$lang.send}" />
 			<input type="hidden" name="isUserReal" />
 		</form>
 	</div>
