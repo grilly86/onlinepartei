@@ -1,5 +1,6 @@
 # onlinepartei.eu - a social politicing platform
-Communicate to make the world a better place, part by part!
+Communicate to make the world a better place, part by part! 
+The page that is motorized by this code can be found here: http://onlinepartei.eu
 
 ## Current features
 * user management
