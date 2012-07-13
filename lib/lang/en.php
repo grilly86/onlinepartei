@@ -4,6 +4,7 @@ class Lang
 	var $languageArray=array(
 		"send"=>"Send",
 		"save"=>"Save",
+		"done"=>"done",
 		"login"=>"Login",
 		"register"=>"Register",
 		"logout"=>"Logout",
@@ -15,7 +16,11 @@ class Lang
 		"posts"=>"Posts",
 		"profile"=>"Profile",
 		"nickname"=>"Nick name",
+		"styleColor"=>"Page color",
 		"profileImage"=>"Profile image",
+		"chooseImage"=>"Choose image file from your computer! (JPG, PNG or GIF)",
+		"cutImage"=>"Define your image section and confirm by clicking &quot;Done&quot;!",
+		"changeImage"=>"Bild ändern",
 		"newPoll"=>"New poll",
 		"pollTooltip"=>"Create a new poll!",
 		"pollBlank"=>"Description",
@@ -76,6 +81,7 @@ class Lang
 		"newTag"=>"New tag",
 		"tagRemoveConfirm"=>"Do you really want to remove that tag?",
 		"taggedWith"=>"Tagged",
+		"adjustEnvironment"=>"Adjust your environment!"
 	);
 	
 	var $monthArray = Array("January","February","March","April","May","June","July","August","September","October","November","December");		 

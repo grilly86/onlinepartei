@@ -10,7 +10,7 @@ body
 	padding:0;margin:0px 3px;
 	min-width:400px;
 }
-form div
+form br
 {
 	clear:left;
 }
@@ -18,6 +18,8 @@ form div
 {
 	-moz-user-select:none;
 	-webkit-user-select:none;
+	-khtml-user-select: none;
+	-o-user-select: none;
 	user-select:none;
 }
 a:link
@@ -401,12 +403,13 @@ a.username
 	clear:right;
 	right:0;
 	
+	padding:0 0 10px 0;
 	margin-bottom:10px;	
 	margin-right:5px;
 	/*background:#447;*/
 	border:2px solid {/literal}{$styleColor}{literal};
-	border-radius:8px 8px 0 0 ;
-	box-shadow: 1px 1px 5px rgba(0,0,0,0.3);   
+	border-radius:8px;
+	box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
 	min-width:200px;
 }
 .errorContainer
@@ -485,7 +488,7 @@ form.loginForm label
 	text-align:right;
 	padding:6px 1px;
 }
-form input, form textarea
+form input.text, form textarea
 {
 	float:left;
 	clear:none;
@@ -700,23 +703,46 @@ fieldset legend
 	margin-right:10px;	
 }
 
+.opButton
+{
+	float:left;
+	cursor:pointer;
+	background:{/literal}{$styleColor}{literal};
+	background:{/literal}{$styleColor}{literal};
+	border:2px solid #fff; /*{/literal}{$styleColor}{literal};*/
+	border-radius:10px;
+	color:#fff;
+	text-shadow:1px 1px 4px rgba(0,0,0,0.8);
+	padding:3px 6px;
+	cursor:pointer;
+	font-weight:bold;
+	letter-spacing:0.3px;
+	box-shadow: 1px 3px 13px rgba(0,0,0,0.6);
+	font-size:10pt;
+}
+.opButton:hover,opButton:focus
+{
+	border:2px solid {/literal}{$styleColor}{literal};
+	box-shadow: 0px 1px 8px rgba(0,0,0,0.9);
+	text-shadow:1px 1px 4px rgba(0,0,0,0.3);
+	background:#fff!important;
+	color:{/literal}{$styleColor}{literal};
+	
+}
+.opButton:active
+{
+	background:{/literal}{$styleColor}{literal}!important;
+	color:#000;
+	border:2px solid #000;
+}
+opButton.disabled
+{
+	background:#bbb;
+	cursor:default;
+}
 .contentContainer form input.submit
 {
 	float:right;
-	background:{/literal}{$styleColor}{literal};
-	border:none;
-	border-radius:8px;
-	color:#fff;
-	text-shadow:1px 1px 4px rgba(0,0,0,0.8);
-	padding:4px 6px;
-	cursor:pointer;
-	font-weight:bold;
-	border:1px solid #444;
-}
-.contentContainer form input.submit:hover
-{   
-	box-shadow:0px 0px 5px {/literal}{$styleColor}{literal};
-	border:1px solid #fff;
 }
 .qtip
 {	
@@ -729,9 +755,18 @@ div.preview
 	border:2px solid {/literal}{$styleColor}{literal};
 	background:#ccc;
 	display:none;
-		
 }
-
+div.preview.loading
+{
+	clear:left;
+	display:block;
+	background:url(static/img/loader.gif) center no-repeat;
+	padding:40px 0;
+}
+div.preview.loading input.opButton
+{
+	display:none;
+}
 .drawAvatarSize
 {
 	border:1px groove #fff;
@@ -1219,24 +1254,11 @@ textarea.message
 	right:5px;
 	bottom:2px;	
 	float:right;
-	background:{/literal}{$styleColor}{literal};
-	border:2px solid {/literal}{$styleColor}{literal};
-	border-radius:8px;
-	color:#fff;
-	text-shadow:1px 1px 4px rgba(0,0,0,0.8);
-	padding:4px 6px;
-	cursor:pointer;
-	font-weight:bold;
 }
 
 .newPostForm.status .submit
 {
 	display:none;
-}
-.newPostForm .submit:hover,.newPostForm .submit:focus
-{
-	border:2px solid #fff;
-	box-shadow:0px 0px 5px {/literal}{$styleColor}{literal};
 }
 .newPostForm .submit:focus
 {
@@ -1273,24 +1295,6 @@ textarea.message
 .newPostForm .message.empty
 {
 	padding:10px 5px;
-}
-.newPostForm button
-{
-	background:{/literal}{$styleColor}{literal};
-	margin:5px 0 5px 5px;
-	padding:6px 10px;
-	color:#fff;
-	text-shadow:0px 1px 3px rgba(0,0,0,0.3);
-	border-radius:5px;
-	border:none;
-	font-size:8pt;
-	font-weight:bold;
-	cursor:pointer;
-}
-.newPostForm button.disabled
-{
-	background:#bbb;
-	cursor:default;
 }
 .resizeHandleVertical
 {
@@ -1383,7 +1387,7 @@ a.footerButton
 a.footerButton:hover
 {
 	background:{/literal}{$styleColor}{literal};
-	color:#fff;
+	color:#fff!important;
 	border-color:#fff;
 }
 .postContainer a 
@@ -1431,7 +1435,7 @@ a.footerButton.comment.active:hover span.icon.comment
 a.footerButton.comment.active
 {
 	background:{/literal}{$styleColor}{literal};
-	color:#fff;
+	color:#fff!important;
 	border-color:#fff;
 	border-radius:8px;
 	border-bottom:1px solid #fff;
@@ -1441,7 +1445,7 @@ a.footerButton.comment.active
 a.footerButton.comment.active:hover
 {
 	background:#fff;
-	color:{/literal}{$styleColor}{literal};
+	color:{/literal}{$styleColor}{literal}!important;
 	border-color:{/literal}{$styleColor}{literal};
 }
 
@@ -1581,7 +1585,7 @@ button.chat.delete
 	box-shadow:0px 3px 5px rgba(0,0,0,0.2);
 	float:right;
 	cursor:pointer;
-	opacity:0.5;
+	opacity:0.8;
 }
 .soundButton:hover
 {
@@ -1742,9 +1746,20 @@ blockquote
 	background-image:url(static/img/quote_open.png),url(static/img/quote_close.png);
 	background-repeat: no-repeat;
 	background-position: top left, bottom right;
-	border:1px solid #ccc;
+	border:1px solid #aaa;
 	border-radius:5px;
-	color:#666;
+	color:#444;
+}
+div.share
+{
+	float:left;
+	position:absolute;
+	left:200px;
+	opacity:0.6;
+}
+div.share:hover
+{
+	opacity:0.8;
 }
 div.tag
 {
@@ -1847,7 +1862,13 @@ h1.tagline span.tagicon
 	height:16px;
 	background:url(static/img/dice.png) no-repeat center;
 	right:-18px;
-	top:4px;cursor:pointer;  
+	top:6px;
+	cursor:pointer;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 }
  #colorPickerInput
  {
@@ -1867,7 +1888,7 @@ h1.tagline span.tagicon
 	 
 	 background-image:url(static/img/colorPicker.png);
 	 background-repeat:no-repeat;
-	 background-position:5px 2px;
+	 background-position:5px 4px;
  }
  #colorPicker
  {

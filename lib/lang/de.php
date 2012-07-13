@@ -4,6 +4,7 @@ class Lang
 	var $languageArray=array(
 		"send"=>"Senden",
 		"save"=>"Speichern",
+		"done"=>"Fertig",
 		"login"=>"Anmelden",
 		"register"=>"Registrieren",
 		"logout"=>"Auslogggen",
@@ -15,10 +16,14 @@ class Lang
 		"posts"=>"Meldungen",
 		"profile"=>"Profil",
 		"nickname"=>"Nickname",
+		"styleColor"=>"Farbe",
 		"profileImage"=>"Profilbild",
+		"chooseImage"=>"Wähle ein Bild von deiner Festplatte aus! (JPG, PNG oder GIF)",
+		"cutImage"=>"Definiere einen Bild-Ausschnitt und klicke anschließend auf &quot;Fertig&quot;!",
+		"changeImage"=>"Bild ändern",
 		"newPost"=>"Neue Meldung",
 		"postTooltip"=>"Poste eine neue Nachricht!",
-		"postBlank"=>"...",
+		"postBlank"=>"Schreibe eine neue Nachricht! (Bilder, Videos und Urls werden automatisch verlinkt.)",
 		"postCaptionBlank"=>"Überschrift",
 		"newPoll"=>"Neue Umfrage",
 		"pollTooltip"=>"Erstelle eine neue Umfrage!",
@@ -77,10 +82,11 @@ class Lang
 		"newTag"=>"Kennzeichnung hinzufügen",
 		"tagRemoveConfirm"=>"Wollen Sie diese Kennzeichnung wirklich entfernen?",
 		"taggedWith"=>"Markierung",
+		"adjustEnvironment"=>"Umgebung anpassen"
 		);
 	
 	var $monthArray = Array("J&auml;nner","Februar","M&auml;rz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember");		 
-	var $dayOfWeekArray = Array("So","Mo","Di","Mi","Do","Fr","Sa");
+	var $dayOfWeekArray = Array("Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag");
 	
 }
 ?>

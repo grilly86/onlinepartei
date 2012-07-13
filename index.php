@@ -177,6 +177,9 @@
 									{
 										$pageTitle = $obj[0]["username"] ." ". $this->util->makeDateReadable($obj[0]["timestamp"],true);
 									}
+									
+									$pageDescription = strip_tags($obj[0]["messageReadable"]);
+									
 									$pType =$obj[0]['pType'];
 									if (!$pType) $pType = 'post';
 									
@@ -273,6 +276,7 @@
 										$userVote = $userVote[0];
 									}
 								}
+								
 								//all votes
 								$sql = "SELECT COUNT(*) as count, vote as vote FROM poll_vote WHERE pollID=" . (int)$row['id'] . " GROUP BY vote ORDER BY vote";
 								$rsV = mysql_query($sql) or die(mysql_error());
@@ -356,7 +360,7 @@
 									$row["hasImage"]=1;
 									$row["username"] = $this->langArr["guest"];
 								}
-
+								
 								$row['isVoted']=$isVoted;
 								//$row['question'] = $this->util->makeLinks($row['question']);
 								
@@ -373,6 +377,13 @@
 								$row["votingBarWidth"]=$votingBarWidth;
 								$row["date"]=$this->util->makeDateReadable($row["timestamp"],true);
 								$row["type"]='poll';
+								
+								if (isset($_GET["id"]))
+								{
+									$pageTitle = strip_tags(urldecode($row["caption"]));
+									$pageDescription = strip_tags($row['message']);
+								}
+								
 								$obj[] = $row;
 							}
 							$this->smarty->assign("user",$this->user);
@@ -961,6 +972,9 @@
 					$this->smarty->assign("loggedIn", (int)$loggedIn);
 					$this->smarty->assign("user", $this->user);
 					$this->smarty->assign("pageTitle", $pageTitle);
+					if (isset($pageDescription)) $this->smarty->assign("pageDescription", $pageDescription);
+					$this->smarty->assign("pageUrl", "http://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+					
 					$base = "http://" . $_SERVER["HTTP_HOST"];
 					$self= explode("/", $_SERVER["PHP_SELF"]);
 					unset($self[count($self)-1]);

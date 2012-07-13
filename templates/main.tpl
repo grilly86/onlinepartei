@@ -10,7 +10,7 @@
 		{/if}
 		<meta property="og:title" content="{$pageTitle}" />  
 		<meta property="og:description" content="{$pageDescription}" />  
-		<meta property="og:url" content="http://www.onlinepartei.eu/" /> 
+		<meta property="og:url" content="{$pageUrl}" /> 
 		<meta property="og:image" content="http://www.onlinepartei.eu/static/img/logo.png" /> 
 		<link rel="image_src" href="http://www.onlinepartei.eu/static/img/logo.png" />  
 		<link rel="icon" href="http://www.onlinepartei.eu/favicon.ico" type="image/x-icon">
@@ -24,6 +24,7 @@
 		<script type="text/javascript" src="static/script/jquery.qtip-1.0.0-rc3.min.js" ></script>
 		<script type="text/javascript" src="static/script/jquery.jplayer.min.js" ></script>
 		<script type="text/javascript" src="static/script/jquery.validate.min.js" ></script>
+		<script type="text/javascript" src="static/script/socialshareprivacy/jquery.socialshareprivacy.min.js"></script>
 		<script type="text/javascript" src="static/script/fancybox/jquery.fancybox.pack.js"></script>
 		<script type="text/javascript" src="static/script/functions.js" ></script>
 		
@@ -113,6 +114,7 @@
 									$("#colorPickerInput").css({'background-color':color}).val(color);
 									setStyleColor(color);
 									$.cookie('styleColor', '', { expires: -1 })
+									e.preventDefault();
 								});
 						});
 					</script>
@@ -156,14 +158,13 @@
 					</div>
 					<label for="username">{$lang.email}:</label><input class="text" type="text" name="username" id="loginUsername"><br clear="all" />
 					<label for="password">{$lang.password}:</label><input class="text" type="password" name="password" id="loginPassword">
-					<input type="submit" class="submit" value="{$lang.login}">
-				</form>  
-				<br clear="right"/>
+					<input type="submit" class="submit opButton" value="{$lang.login}">
+				</form>
 				<br clear="right"/>
 			</div>
 			<div class="loginFormContainer styleColorBorder">
 				<div class="titleContainer styleColorBackground"><span class="registerIcon"></span>{$lang.register}</div>
-				<form id="registerForm" class="loginForm" method="post" action="index.php?task=register">
+				<form id="registerForm" class="loginForm " method="post" action="index.php?task=register">
 					<div id="registerErrorContainer" class="errorContainer">
 					{if $registerError}
 						{$registerError}
@@ -173,7 +174,7 @@
 					<label for="password">{$lang.password}:</label><input class="text" type="password" name="password" id="registerPassword"><br clear="all" />
 					<label for="password" title="{$lang.repeatPassword}">{$lang.repeatPassword}:</label><input class="text" type="password" name="passwordRepeat" id="registerPasswordRepeat" />
 					<label for="username" title="{$lang.nickname}">{$lang.nickname}:</label><input class="text" type="text" name="username" id="registerUsername" />
-					<input type="submit" class="submit" value="{$lang.register}" />
+					<input type="submit" class="submit opButton" value="{$lang.register}" />
 				</form>
 				{literal}
 				<script type="text/javascript">
@@ -237,7 +238,7 @@
 		</div>
 		{/if}
 		<br />
-		<a href="impressum.html" class="styleColor">{$lang.imprint}</a>
+		<a href="impressum.html" class="styleColor" style="float:right">{$lang.imprint}</a>
 		</div>
 		
 		{$contents}

@@ -41,5 +41,6 @@
 			</label>
 		</div>
 	{/if}
+	<div class="share"></div>
 </div>
 <div class="commentContainerWrapper">{$item.commentsHtml}</div>

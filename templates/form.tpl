@@ -9,7 +9,7 @@
 			<input type="text" class="text empty bold styleColorBorder" name="caption" id="postCaption" />
 			<textarea id="postMessage" class="text message empty styleColorBorder" name="status"></textarea>
 			<br clear="left" />
-			<input type="submit" class="submit styleColorBackground styleColorBorder" value="{$lang.send}" />
+			<input type="submit" class="submit opButton" value="{$lang.send}" />
 			<span class="resizeHandleVertical"></span>
 			<input type="hidden" name="isUserReal" />
 		</form>
@@ -33,9 +33,9 @@
 				</li>
 				
 			</ol>
-			<button class="removePollAnswer styleColorBackground">&minus; Antwortmöglichkeit entfernen</button>
-			<button class="addPollAnswer styleColorBackground">&plus; Antwortmöglichkeit hinzufügen</button>
-			<input type="submit" class="submit show styleColorBackground" value="{$lang.send}" />
+			<button class="removePollAnswer opButton" unselectable>&minus; Antwortmöglichkeit entfernen</button>
+			<button class="addPollAnswer opButton" unselectable>&plus; Antwortmöglichkeit hinzufügen</button>
+			<input type="submit" class="submit show opButton" value="{$lang.send}" />
 			<input type="hidden" name="isUserReal" />
 		</form>
 	</div>

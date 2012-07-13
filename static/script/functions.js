@@ -52,6 +52,7 @@ function getPosts(limit,order,parent)
 			setStyleColor(styleColor);
 			initializeFancybox($(".contentWrapperContainer"));
 			initializeTooltips();
+			initializeSocialSharePrivacy()
 		}
 	});
 }
@@ -99,6 +100,7 @@ $().ready(function() {
 	}
 	else
 	{
+		initializeSocialSharePrivacy();
 		initializeFancybox($(".contentWrapperContainer"));
 	}
 	blinkTimer = setInterval("chatBlinkNew()",1000);
@@ -195,6 +197,17 @@ $().ready(function() {
 	resize=false;
 	});
 	$(window).mousemove(function(e){
+		
+		if (newChatMessage)
+		{
+			newChatMessage = false;
+			setTimeout(function() {
+				$(".chatContainer").each(function( ) {
+					$("#chatLink_" + this.id.substring(5)).removeClass("new");
+				});	// blinkTimer stops blinking when no chatLinks with class 'new'
+			}, 1000);
+		}
+		
 		moving=true;
 		if (drag) 
 		{
@@ -703,7 +716,7 @@ $().ready(function() {
 		var id = $(this).attr("href").substring(1);
 		//alert($("#chatWindows").find("#chat_" + id).length);
 		openChat(id);
-	return false;
+		return false;
 	});
 
 		// für "Status aktualisieren"
@@ -1090,7 +1103,31 @@ $().ready(function() {
 				}
 			});
 	});
+
 });
+
+function initializeSocialSharePrivacy()
+{
+	$(".share:not(.handled)").socialSharePrivacy({
+		services : {
+			facebook : {
+				'perma_option'  : 'off',
+				'action':'like'
+			}, 
+			twitter : {
+				'perma_option' : 'off'
+			},
+			gplus : {
+				'perma_option' : 'off'
+			}
+		},
+		uri : function(context) {
+			$(context).parent().addClass("handled");
+			return "http://www.onlinepartei.eu/" + $(context).parents(".postContainer").find(".postStamp").find(".anchor").attr("href");
+		}
+	});
+}
+
 function openChat(id)
 {
 	if ($("#chatWindows").find("#chat_" + id).length==0)
@@ -1337,7 +1374,7 @@ function initializeFancybox(obj)
 	}); 
 
 }
-
+var newChatMessage=false;
 var messageCountChat = new Array();
 var prevData = new Array();
 
@@ -1352,9 +1389,14 @@ function channel(user)
 			var escapedData = escape(data);
 			if (prevData[user] != escapedData)
 			{
+				
 				//if ((messageCountChat[user] < parseInt($(tempDiv).find(".message").length))&& $("#chat_" + user).find(".messageContainer").find(".loader").length==0 && messageCountChat[user]>0)
-				if (prevData[user] && escapedData > prevData[user] && !muteSound)
+				if (prevData[user] && escapedData.length > prevData[user].length && !muteSound)
 				{
+					newChatMessage = true;
+					$("#chatLink_" + user).addClass("new");
+					clearInterval(blinkTimer);
+					blinkTimer = setInterval("chatBlinkNew()",1000);
 					$("#soundPlayer").jPlayer("play");
 				}
 				var obj = $("#chat_" + user).find(".messageContainer");
@@ -1412,22 +1454,6 @@ function channelAll()
 //======================================================================
 var soundEmbed = null;
 //======================================================================
-function soundPlay(which)
-{
-	/*if (soundEmbed)	
-	{
-		document.body.removeChild(soundEmbed);
-		soundEmbed.removed = true;
-		soundEmbed = null;		
-	}
-	soundEmbed = document.createElement("embed");
-	soundEmbed.setAttribute("src", "static/sound/"+which);
-	soundEmbed.setAttribute("hidden", true);
-	soundEmbed.setAttribute("autostart", true);
-				
-	soundEmbed.removed = false;
-	document.body.appendChild(soundEmbed);*/
-}
 var titleBlink=false;
 var titleBlinkID=0;
 var titleStoreCaption = "";
@@ -1755,7 +1781,16 @@ function setStyleColor(color)
 		$(".styleColorBorderTop").css("border-color-top", color);
 		$(".styleColorBorderBottom").css("border-color-bottom", color);
 		$(".styleColorBackground").css("background-color", color);
+		$(".opButton").css("background-color", color);
+		
 		$(".styleColor").css("color", color);
+		
+		$(".opButton").unbind("hover").hover(function() {
+			$(this).css({"border-color":color,"color":color,"background-color":"#fff"});
+		},function() {
+			$(this).css({"border-color":"#fff","color":"#fff","background-color":color});
+		});
+		
 	}
 }
 function colorToHex( c ) {

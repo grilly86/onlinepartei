@@ -5,55 +5,54 @@
 			<div class="contentContainer postContainer styleColorBorder">
 				<h1 class="styleColor">{$lang.profile}</h1>
 				<form name="profile" method="post" action="index.php?task=settings" enctype="multipart/form-data">
-					<div>
-						<label for="nickname">
-							{$lang.email}:
-						</label>
-						<label style="color:#999;width:300px;">{$user.email} (wird nicht angezeigt)</label>
+					<label for="nickname">
+						{$lang.email}:
+					</label>
+					<label style="color:#999;width:300px;">{$user.email} (wird nicht angezeigt)</label>
+					<br />
+					<label for="nickname">
+						{$lang.nickname}:
+					</label>
+					<input class="text" type="text" name="nickname" id="nickname" value="{$user.name}" />
+					<br />
+					<label for="language">
+						{$lang.language}
+					</label>
+					<select id="language" name="language">
+						<option value="de" {if $user.language=="de"}selected="selected"{/if}>{$lang.languageGerman}</option>
+						<option value="en" {if $user.language=="en"}selected="selected"{/if}>{$lang.languageEnglish}</option>
+					</select>
+					<br />
+					<label for="colorPickerInput">{$lang.styleColor}:</label>
+					<div style="position:relative;float:left;clear:none">
+						<input type="text" class="text" id="colorPickerInput" name="color" value="{$user.color}" /><span class="colorPickerDice"></span>
+						<div id="colorPicker"></div>
 					</div>
-					<div>					
-						<label for="nickname">
-							{$lang.nickname}:
-						</label>
-						<input class="text" type="text" name="nickname" id="nickname" value="{$user.name}" />
-					</div>
-					<div>
-						<label for="language">
-							{$lang.language}
-						</label>
-						<select id="language" name="language">
-							<option value="de" {if $user.language=="de"}selected="selected"{/if}>{$lang.languageGerman}</option>
-							<option value="en" {if $user.language=="en"}selected="selected"{/if}>{$lang.languageEnglish}</option>
-						</select>
-					</div>
-					<div>
-						
-						<label for="colorPickerInput">Farbe:</label>
-						<div style="position:relative;float:left;clear:none">
-							<input type="text" class="text" id="colorPickerInput" name="color" value="{$user.color}" /><span class="colorPickerDice"></span>
-							<div id="colorPicker"></div>
-						</div>
-						{*<span><strong>Hinweis: </strong>F&uuml;r optimale Lesbarkeit wird ein <strong>dunkler Farbwert</strong> empfohlen!</span></div>*}
-					</div>
-					<div>
-						<label for="profileImage">
-							{$lang.profileImage}:
-						</label>
-						{if $user.hasImage}
-							<img src="uploads/p/{$user.id}.jpg?time={$smarty.now}">
-							<br clear="all" />
-						{/if}
-						<input class="text" type="file" name="profileImage" size="20" id="profileImage" />
-					</div>
-					<div class="preview">
-						<div class="drawAvatarSize">
-							<div class="drawAvatarResize">
-							</div>
-						</div>
-						<div id="thumbDiv"></div>
-						<img id="thumb" />
-						<img id="preview" />
+					{*<span><strong>Hinweis: </strong>F&uuml;r optimale Lesbarkeit wird ein <strong>dunkler Farbwert</strong> empfohlen!</span></div>*}
+					<br />
+					<label for="profileImage" >
+						{$lang.profileImage}:
+					</label>
+					{if $user.hasImage}
+						<img src="uploads/p/{$user.id}.jpg?time={$smarty.now}">
 						<br clear="all" />
+					{/if}
+					<p class="labelChooseImage small">{$lang.chooseImage}</p>
+					<p class="labelCutImage small" style="display:none">{$lang.cutImage}</p>
+					<label class="labelCutImage" style="display:none">{$lang.changeImage}:</label>
+					<input class="text" type="file" name="profileImage" size="20" id="profileImage" />
+					<br />
+					<div class="preview styleColorBorder" unselectable>
+						<div class="drawAvatarSize">
+							<div class="drawAvatarResize"></div>
+						</div>
+						<div id="thumbDiv"></div><img id="thumb" />
+						
+							<img id="preview" />
+							<input type="submit" class="opButton" value="{$lang.done}" style="position:absolute;left:50%;top:50%;" />
+						
+						<br clear="all" />
+						
 					</div>
 					<input type="hidden" name="uploadProfileImage" id="uploadProfileImage" value="0" />
 					<br clear="left" />
@@ -67,10 +66,9 @@
 						<br clear="left" />
 						<label for="checkOnlineTime" class="auto"><input disabled class="check" type="checkbox" name="onlineTime" id="checkOnlineTime" value="1" checked="checked">Zeitpunkt der letzten Aktivit&auml;t anzeigen</label>
 						<p>
-						
 					</fieldset>
 					<br clear="left" />
-					<input class="submit styleColorBackground" type="submit" value="{$lang.save}" />
+					<input class="submit opButton styleColorBackground" type="submit" value="{$lang.save}" />
 					<br clear="left" />
 					<br clear="left" />
 				</form>
@@ -88,20 +86,20 @@
 											action: "index.php?task=fileUpload",
 											name: 'profileImage',
 											onSubmit: function(file, extension) {
+												console.log("zack!");
 															$('div.preview').addClass('loading');
 											},
 											onComplete: function(file, response) {
+												console.log("bum!");
 															thumb.load(function(){
-																		$('div.preview').removeClass('loading');
-																		thumb.unbind();
-																		initializeAvatarSize(response);
-
+																$('div.preview').removeClass('loading');
+																thumb.unbind();
+																initializeAvatarSize(response);
+																$(".labelCutImage").show();
+																$(".labelChooseImage").hide();
 															});
 															var date = new Date();
 															thumb.attr('src', response+ "?time=" + date.getTime());
-
-
-
 											}
 							});
 	});
