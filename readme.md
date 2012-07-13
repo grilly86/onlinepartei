@@ -5,9 +5,10 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 ## Current features
 * user management
 * user-to-user chat, with (mutable) sound feedback
-* message posting with automatic link, image or video (currently only youtube) recognition and the posibility to edit messages after posting
+* posts with automatic link, image or video (currently only youtube) recognition and the posibility to edit messages after posting
 * poll creation and voting
 * (nested) commenting possible
+* tagging messages and list sorted by tags
 * some user settings (profile picture, language selection, style color)
 * 2-click social media plugin
 
