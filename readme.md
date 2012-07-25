@@ -22,14 +22,14 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 * `style.css` is in `templates/` as it is processed by smarty
 * in `static/script/functions.js` ***most*** of the JS events are stored - sometimes though the javascript is placed directly in the HTML context
 
+## Important To-dos (not exhaustive)
+* Make post captions and polls editable
+* Make chat messages editable
+* Optimize for smart phones
+
 ## What we need!
 * More users! More ideas on how the project should envolve!
 * If you copy the source code to run your own website with it, I would be glad if you let me know - mail to grilly86@gmail.com f.e.
 * More discussion on what's going on!
 * Love
 * Peace
-
-## Important to-dos (not exhaustive)
-* Make post captions and polls editable
-* Make chat messages editable
-* Optimize for smart phones
