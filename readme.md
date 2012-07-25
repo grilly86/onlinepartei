@@ -28,3 +28,8 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 * More discussion on what's going on!
 * Love
 * Peace
+
+## Important to-dos (not exhaustive)
+* Make post captions and polls editable
+* Make chat messages editable
+* Optimize for smart phones
