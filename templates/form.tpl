@@ -6,8 +6,8 @@
 	<br clear="left" />
 		<form class="newPostForm post {if $postActive}show{/if} styleColorBorder" name="newStatusForm" id="newPostForm" method="post">
 			<span class="addPostArrow status styleColorBackground"></span>
-			<input type="text" class="text empty bold styleColorBorder" name="caption" id="postCaption" />
-			<textarea id="postMessage" class="text message empty styleColorBorder" name="status"></textarea>
+			<input type="text" class="text empty bold styleColorBorder" name="caption" id="postCaption" placeholder="{$lang.postCaptionBlank}" />
+			<textarea id="postMessage" class="text message empty styleColorBorder" name="status"  placeholder="{$lang.postBlank}"></textarea>
 			<br clear="left" />
 			<input type="submit" class="submit opButton" value="{$lang.send}" />
 			<span class="resizeHandleVertical"></span>
@@ -15,21 +15,21 @@
 		</form>
 		<form class="newPostForm poll {if $pollsActive}show{/if} styleColorBorder" name="newPollForm" id="newPollForm" method="post">
 			<span class="addPostArrow poll styleColorBackground"></span>
-			<input type="text" class="text empty bold" name="question" id="pollQuestion" />
-			<textarea id="pollDescription" class="text message empty" name="description" style="display:none"></textarea>
+			<input type="text" class="text empty bold" name="question" id="pollQuestion" placeholder="{$lang.pollQuestion}" />
+			<textarea id="pollDescription" class="text message empty" name="description" placeholder="{$lang.pollDescription}" style="display:none"></textarea>
 			<br clear="left" />
 			<ol id="pollAnswers">
 				<li id="liAnswer1">
 					<label class="inset" for="answer1">&bull;</label>
-					<input class="inset text" type="text" name="answer1" id="answer1" value=""/>
+					<input class="inset text" type="text" name="answer1" id="answer1" value="" placeholder="{$lang.answer} 1" />
 				</li>
 				<li id="liAnswer2">
 					<label class="inset" for="answer2">&bull;</label>
-					<input class="inset text" type="text" name="answer2" id="answer2" value=""/>
+					<input class="inset text" type="text" name="answer2" id="answer2" value="" placeholder="{$lang.answer} 2"/>
 				</li>
 				<li id="liAnswer3">
 					<label class="inset" for="answer3">&bull;</label>
-					<input class="inset text" type="text" name="answer3" id="answer3" value=""/>
+					<input class="inset text" type="text" name="answer3" id="answer3" value="" placeholder="{$lang.answer} 3"/>
 				</li>
 				
 			</ol>

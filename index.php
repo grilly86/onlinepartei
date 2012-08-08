@@ -43,7 +43,10 @@
 						{
 							$l = "en";
 						}
-						//print_r($_POST);
+					}
+					else
+					{
+						$l = lang_getfrombrowser(array('de','en'),'de');
 					}
 					define("LANGUAGE",$l);
 					include_once "lib/lang/lang.php";
@@ -57,8 +60,8 @@
 						case "slogan":
 							include_once "lib/util.php";
 							$this->util = new Util($lang);
-
-							die ($this->getRandomSlogan());
+							$id = (int)$_GET["id"];
+							die ($this->getRandomSlogan($id));
 							
 							break;
 						case "tag":
@@ -255,7 +258,7 @@
 								$id = (int)$_GET["id"];
 								$where = " WHERE poll.id=" . $id;
 							}
-							$sql = "SELECT poll.id,poll.question as caption, poll.text as message,poll.answers as answers, poll.timestamp as timestamp, user.name as username,user.id as userid,user.hasImage as hasImage, COUNT(sub.id) as comments, SUM(sub.deleted) as deletedComments  FROM poll " . 
+							$sql = "SELECT poll.id,poll.question as caption, poll.text as message,poll.messageHtml as messageHtml,poll.answers as answers, poll.timestamp as timestamp, user.name as username,user.id as userid,user.hasImage as hasImage, COUNT(sub.id) as comments, SUM(sub.deleted) as deletedComments  FROM poll " . 
 									"LEFT JOIN user ON user.id = poll.userID " .
 									"LEFT JOIN post as sub ON poll.id=sub.postID AND sub.type='poll' " . 
 									$where .
@@ -371,7 +374,7 @@
 								{
 									$row["tags"][]=$this->config->convertFromDatabase($rowTag['name']);
 								}
-								$row['message'] = $this->util->makeLinks($row['message']);
+								$row['message'] = $row['messageHtml'];
 								$row["comments"]=$row["comments"]-$row["deletedComments"];
 								$row["percent"]=$percent;
 								$row["votingBarWidth"]=$votingBarWidth;
@@ -705,20 +708,29 @@
 								$this->smarty->assign("contents", $this->smarty->fetch("settings.tpl"));
 								$this->smarty->assign("settingsActive", "active");
 							}
-
+							else
+							{
+								// no user
+								header("Status: 404 Not Found");
+								$this->smarty->assign("TPL_POSTS", $this->smarty->fetch("error/404.tpl"));
+								$this->smarty->assign("contents", $this->smarty->fetch("form.tpl"));
+							}
 							break;
 						case "ajaxPost":
+							include_once "lib/util.php";
+							$this->util = new Util($lang);
 							if (isset($_POST["message"]))
 							{
 								$this->saveStat();
 								$caption ="";
 								$message = $this->config->convertToDatabase($_POST["message"]);
+								$messageHtml = $this->config->convertToDatabase(urlencode($this->util->makeLinks(urldecode($_POST["message"]))));
 								if (isset($_POST["caption"]))
 								{
 									$caption = $this->config->convertToDatabase($_POST["caption"]);
 								}
 
-								$sql = 'INSERT INTO post (postID,userID,caption,message,timestamp) VALUES (0,'.$this->user["id"].',"'.$caption.'","'.$message.'","'.date("Y-m-d H:i:s").'")';
+								$sql = 'INSERT INTO post (postID,userID,caption,message,messageHtml,timestamp) VALUES (0,'.$this->user["id"].',"'.$caption.'","'.$message.'","'.$messageHtml.'","'.date("Y-m-d H:i:s").'")';
 								mysql_query($sql);
 								$id = mysql_insert_id();
 								$getPost = true;
@@ -729,6 +741,7 @@
 							{
 								$question=$this->config->convertToDatabase($_POST['question']);
 								$description = $this->config->convertToDatabase($_POST['description']);
+								$messageHtml = $this->config->convertToDatabase(urlencode($this->util->makeLinks(urldecode($_POST["description"]))));
 								$answers = $this->config->convertToDatabase($_POST['answer1']);
 								$i=2;
 								while (isset($_POST['answer' . $i]))
@@ -736,7 +749,7 @@
 									$answers .= ';'.$this->config->convertToDatabase($_POST['answer' . $i]);
 									$i++;
 								}
-								$sql = 'INSERT INTO poll(userID,question,text,answers,timestamp) VALUES ('. $this->user['id'].',"' . $question . '","' . $description . '","' . $answers.'","'.date("Y-m-d H:i:s") . '")';
+								$sql = 'INSERT INTO poll(userID,question,text,messageHtml,answers,timestamp) VALUES ('. $this->user['id'].',"' . $question . '","' . $description . '","'.$messageHtml.'","' . $answers.'","'.date("Y-m-d H:i:s") . '")';
 
 								mysql_query($sql) or die(mysql_error());
 								$id = mysql_insert_id();
@@ -750,9 +763,12 @@
 							{
 								if (isset($_POST["parentID"]) && isset($_POST["message"]))
 								{
+									include_once "lib/util.php";
+									$this->util = new Util($lang);
 									$parentID=(int)$_POST["parentID"];
 									//$message = str_replace("||plus||", "+", $_POST["message"]);
 									$message = $this->config->convertToDatabase($_POST["message"]);
+									$messageHtml = $this->config->convertToDatabase(urlencode($this->util->makeLinks(urldecode($_POST["message"]))));
 									//echo "<pre>" . $message . "</pre>";
 									$id=0;
 									if (isset($_POST["id"]) && $_POST["id"]>0)
@@ -774,11 +790,11 @@
 										if ($id == $parentID)
 										{
 											$getPost = true;
-											$sql = "UPDATE post SET message='".$message."' ".$sqlSet." WHERE id=" . $id . " AND (userID=" . $userID . " OR userID=0)";
+											$sql = "UPDATE post SET message='".$message."',messageHtml='".$messageHtml."' ".$sqlSet." WHERE id=" . $id . " AND (userID=" . $userID . " OR userID=0)";
 										}
 										else
 										{
-											$sql = "UPDATE post SET message='".$message."' ".$sqlSet." WHERE id=" . $id . " AND (userID=" . $userID . " OR userID=0)" . " AND postID=" . $parentID;
+											$sql = "UPDATE post SET message='".$message."',messageHtml='".$messageHtml."' ".$sqlSet." WHERE id=" . $id . " AND (userID=" . $userID . " OR userID=0)" . " AND postID=" . $parentID;
 										}
 										$rs = mysql_query($sql) or die(mysql_error());
 									}
@@ -794,7 +810,7 @@
 										{
 											$userID = (int)$this->user["id"];
 										}
-										$sql = "INSERT INTO post (postID, message, userID, timestamp,type) VALUES (" . $parentID . ",'".$message."',".$userID.",'".date("Y-m-d H:i:s")."','".$type."')";
+										$sql = "INSERT INTO post (postID, message,messageHtml, userID, timestamp,type) VALUES (" . $parentID . ",'".$message."','".$messageHtml."',".$userID.",'".date("Y-m-d H:i:s")."','".$type."')";
 										$rs = mysql_query($sql) or die(mysql_error());
 										$id = mysql_insert_id();
 									}
@@ -890,10 +906,6 @@
 								{
 									$this->smarty->assign("withCaption", true);
 								}
-								if (count($obj)>1)
-								{
-									//$this->smarty->assign("item")
-								}	
 								if (isset($obj[0]))
 								{
 									$this->smarty->assign("item", $obj[0]);
@@ -986,9 +998,11 @@
 					$this->saveStat();
 		}
 	}
-	function getRandomSlogan()
-	{						
-		$obj = $this->getPostList("tag.name='slogan'","RAND()","1","both");
+	function getRandomSlogan($id=0)
+	{			
+		$sqlNot="";
+		if ($id) $sqlNot = " AND post.id!=" . $id ." ";
+		$obj = $this->getPostList("tag.name='slogan'". $sqlNot,"RAND()","1","post");
 		if ($obj)
 		{
 			$this->smarty->assign("slogan", $obj[0]);
@@ -1043,7 +1057,7 @@
 			$sql="";
 			if ($withPost)
 			{
-				$sql =	"SELECT post.id as id, post.postID as postid, post.caption as caption, post.message as message, post.timestamp as `timestamp`,post.message as answers, '0' as poll,user.name as username, user.id as userid, user.hasImage as hasImage,post.type as pType " . 
+				$sql =	"SELECT post.id as id, post.postID as postid, post.caption as caption, post.message as message,post.messageHtml as messageHtml,  post.timestamp as `timestamp`,post.message as answers, '0' as poll,user.name as username, user.id as userid, user.hasImage as hasImage,post.type as pType " . 
 						"FROM post " . 
 							"LEFT JOIN user ON user.id=post.userid " . 
 							"LEFT JOIN post_tag as pt ON post.id=pt.parentID AND pt.type='' " . 
@@ -1054,7 +1068,7 @@
 			{
 				if ($withPost)	$sql .= " UNION ";
 				
-				$sql .="SELECT poll.id as id, '0' as postid, poll.question as caption, poll.text as message, poll.timestamp as `timestamp`, poll.answers as answers, '1' as poll, user.name as username, user.id as userid, user.hasImage as hasImage, '' as pType " . 
+				$sql .="SELECT poll.id as id, '0' as postid, poll.question as caption, poll.text as message,poll.messageHtml as messageHtml,poll.timestamp as `timestamp`, poll.answers as answers, '1' as poll, user.name as username, user.id as userid, user.hasImage as hasImage, '' as pType " . 
 							"FROM poll " . 
 							"LEFT JOIN user ON user.id=poll.userid " . 
 							"LEFT JOIN post_tag as pt ON poll.id=pt.parentID AND pt.type='poll' " . 
@@ -1129,8 +1143,6 @@
 							$row['answer'][$i]["userVote"] = false;
 						}
 					}
-					
-					
 					//print_r($row['answer']);
 				}
 				
@@ -1197,137 +1209,12 @@
 				$row["votingBarWidth"]=$votingBarWidth;
 				$row["date"]=$this->util->makeDateReadable($row["timestamp"],true);
 				$row["message"]=$this->config->convertFromDatabase($row["message"]);
-				$row["messageReadable"] = $this->util->makeLinks($row["message"]);
+				$row["messageReadable"] = $this->config->convertFromDatabase($row["messageHtml"]);
 				$row["message"]=urlencode($row["message"]);
 				$obj[]=$row;
 			}
 			return $obj;
 	}
-	/*function getPostList($sqlWhere="", $sqlOrder="timestamp DESC", $limit="",$type="")
-	{
-		$sql = "";
-		if ($sqlOrder)
-		{
-			$sqlOrder = " ORDER BY " . $sqlOrder;
-		}
-		$sqlLimit = "";
-		if ($limit)
-		{
-			$sqlLimit = " LIMIT " . $limit;
-		}
-		$typeWhere = " AND post.type='' ";
-		//$tagTypeWhere = " AND pt.type='' ";
-		if ($type=="poll")
-		{
-			$typeWhere = " AND post.type='poll' ";
-			//$tagTypeWhere = " AND pt.type='poll' ";
-		}
-		if ($type == "both")
-		{
-			$typeWhere = " ";
-		}
-		if ($sqlWhere)
-		{
-			$sql =	"SELECT post.id as id,post.postID as postid,post.caption as caption,post.timestamp as timestamp,post.type as `type`, user.name as username,user.id as userid,user.hasImage as hasImage,post.message as message " . 
-					"FROM post " .
-							"LEFT JOIN user ON user.id = post.userID ".
-							"LEFT JOIN post_tag as pt ON post.id=pt.parentID " . 
-							"LEFT JOIN tag ON pt.tagID=tag.id " . 
-					"WHERE post.deleted=0 AND ".$sqlWhere." " . $typeWhere .
-					"GROUP BY post.id " . $sqlOrder . $sqlLimit;
-		}
-		else
-		{
-			$sql = "SELECT post.id as id,post.postID as postid, post.caption as caption,post.timestamp as timestamp,post.type as `type`,user.name as username,user.id as userid,user.hasImage as hasImage,post.message as message " . 
-					"FROM post ". 
-							"LEFT JOIN user ON user.id = post.userID " . 
-							"LEFT JOIN post_tag as pt ON post.id=pt.parentID " . 
-							"LEFT JOIN tag as tag ON pt.tagID=tag.id " . 
-					"WHERE post.postID=0 AND post.deleted=0 ".$typeWhere." GROUP BY post.id " . $sqlOrder . $sqlLimit;
-		}
-		$obj = array();
-		$rs = mysql_query($sql) or die(mysql_error());
-		
-		while($row = mysql_fetch_assoc($rs))
-		{
-			$typeWhere = " AND r.type='' ";
-			if ($type=="poll")
-			{
-				$typeWhere = " AND r.type='poll' ";
-			}
-			if ($type == "both")
-			{
-				$typeWhere = " ";
-			}
-			if ($this->user)
-			{	// with myRating
-				$sql = "SELECT SUM(r.rating='like') as `like`, SUM(r.rating='dislike') as `dislike`, myRating.rating as myRating FROM rating r LEFT JOIN rating myRating ON myRating.postID=".$row["id"]. " AND myRating.userID=".$this->user["id"]." WHERE r.postID=" . $row["id"] . $typeWhere. " GROUP BY r.postID";
-			}
-			else
-			{
-				//without myRating
-				$sql = "SELECT SUM(r.rating='like') as `like`, SUM(r.rating='dislike') as `dislike` FROM rating r WHERE r.postID=" . $row["id"] . $typeWhere . " GROUP BY r.postID";
-			}
-			$rsRating = mysql_query($sql) or die(mysql_error());
-			if ($rowRating = mysql_fetch_assoc($rsRating))
-			{
-				if (isset($rowRating["like"]))
-				{	$row["like"] = (int)$rowRating["like"]; }
-				else
-				{	$row["like"]=0;	}
-				if (isset($rowRating["dislike"]))
-				{	$row["dislike"] = (int)$rowRating["dislike"]; }
-				else
-				{	$row["dislike"]=0;	}
-				if (isset($rowRating["myRating"]))
-				{
-					$row["myRating"] = $rowRating["myRating"];
-				}
-				
-			}
-			else
-			{ $row["like"]=0;$row["dislike"]=0; }
-			$sum = $row["like"] + $row["dislike"];
-			if ($sum)
-			{
-				$percent = (int)($row["like"]/$sum*100);
-				$votingBarWidth = $percent/2;
-			}
-			else
-			{
-				$votingBarWidth = 25;
-				$percent = "-";
-			}
-			if (!$row["userid"]>0)
-			{
-				$row["userid"]=0;
-				$row["hasImage"]=1;
-				$row["username"] = $this->langArr["guest"];
-			}
-			// tags 
-			$sql = 'SELECT tag.name as name FROM post_tag LEFT JOIN tag ON post_tag.tagID=tag.id WHERE parentID=' . $row['id'] . " AND `type`='' ORDER BY name";
-			$rsTag = mysql_query($sql) or die(mysql_error());
-			while ($rowTag = mysql_fetch_assoc($rsTag))
-			{
-				$row["tags"][]=$this->config->convertFromDatabase($rowTag['name']);
-			}
-			$row["caption"]=$this->config->convertFromDatabase($row["caption"]);
-			
-			$sql = "SELECT count(*) FROM post WHERE postID=" . $row['id'] . " AND type='".$type."' AND deleted=0";
-			$rsComments = mysql_query($sql) or die(mysql_error());
-			$rowComments = mysql_fetch_array($rsComments);
-			
-			$row["comments"]=$rowComments[0];
-			$row["percent"]=$percent;
-			$row["votingBarWidth"]=$votingBarWidth;
-			$row["date"]=$this->util->makeDateReadable($row["timestamp"],true);
-			$row["message"]=$this->config->convertFromDatabase($row["message"]);
-			$row["messageReadable"] = $this->util->makeLinks($row["message"]);
-			$row["message"]=urlencode($row["message"]);
-			$obj[]=$row;
-		}
-		return $obj;
-	}*/
 	
 	function saveStat()
 	{
@@ -1366,5 +1253,76 @@
 		$sql = "INSERT INTO stat (userid,timestamp,ip,ua,referrer,request) VALUES(" .$userId.",'".date("Y-m-d H:i:s")."','".$ip."','". $ua . "','" .$referrer."','".$request."')";
 		mysql_query($sql);
 	}
+}
+
+// Browsersprache ermitteln
+function lang_getfrombrowser ($allowed_languages, $default_language, $lang_variable = null, $strict_mode = true) {
+	// $_SERVER['HTTP_ACCEPT_LANGUAGE'] verwenden, wenn keine Sprachvariable mitgegeben wurde
+	if ($lang_variable === null) {
+				$lang_variable = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+	}
+
+// wurde irgendwelche Information mitgeschickt?
+	if (empty($lang_variable)) {
+			// Nein? => Standardsprache zurückgeben
+			return $default_language;
+	}
+
+	// Den Header auftrennen
+	$accepted_languages = preg_split('/,\s*/', $lang_variable);
+
+	// Die Standardwerte einstellen
+	$current_lang = $default_language;
+	$current_q = 0;
+
+	// Nun alle mitgegebenen Sprachen abarbeiten
+	foreach ($accepted_languages as $accepted_language) {
+			// Alle Infos über diese Sprache rausholen
+			$res = preg_match ('/^([a-z]{1,8}(?:-[a-z]{1,8})*)'.
+							'(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i', $accepted_language, $matches);
+
+			// war die Syntax gültig?
+			if (!$res) {
+					// Nein? Dann ignorieren
+					continue;
+		}
+
+			// Sprachcode holen und dann sofort in die Einzelteile trennen
+			$lang_code = explode ('-', $matches[1]);
+
+			// Wurde eine Qualität mitgegeben?
+			if (isset($matches[2])) {
+					// die Qualität benutzen
+					$lang_quality = (float)$matches[2];
+			} else {
+					// Kompabilitätsmodus: Qualität 1 annehmen
+					$lang_quality = 1.0;
+			}
+
+			// Bis der Sprachcode leer ist...
+			while (count ($lang_code)) {
+					// mal sehen, ob der Sprachcode angeboten wird
+					if (in_array (strtolower (join ('-', $lang_code)), $allowed_languages)) {
+							// Qualität anschauen
+							if ($lang_quality > $current_q) {
+									// diese Sprache verwenden
+									$current_lang = strtolower (join ('-', $lang_code));
+									$current_q = $lang_quality;
+									// Hier die innere while-Schleife verlassen
+									break;
+							}
+					}
+					// Wenn wir im strengen Modus sind, die Sprache nicht versuchen zu minimalisieren
+					if ($strict_mode) {
+							// innere While-Schleife aufbrechen
+							break;
+					}
+					// den rechtesten Teil des Sprachcodes abschneiden
+					array_pop ($lang_code);
+			}
+	}
+
+	// die gefundene Sprache zurückgeben
+	return $current_lang;
 }
 ?>

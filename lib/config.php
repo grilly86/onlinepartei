@@ -57,7 +57,7 @@ class Config
 	function convertFromDatabase($str)
 	{
 		$str = urldecode(utf8_encode($str));
-		$str = str_replace(array("<",">"),array("&lt;","&gt;"),$str);
+		//$str = str_replace(array("<",">"),array("&lt;","&gt;"),$str);
 		return stripslashes($str);
 	}
 

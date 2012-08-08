@@ -2,6 +2,7 @@
 class Lang
 {
 	var $languageArray=array(
+		"pageSubTitle"=>"SOCIAL POLITICING PLATFORM",
 		"send"=>"Send",
 		"save"=>"Save",
 		"done"=>"done",
@@ -69,6 +70,7 @@ class Lang
 		"unmuteSound" => "Chat sounds are off",
 		"pollQuestion"=>"What\'s your question?",
 		"pollDescription"=>"Erläuternde Beschreibung",
+		"answer"=>"answer",
 		"noUsername"=>"<i>(no name)</i>",
 		"loginToVote"=>"Please log in to vote.",
 		"showPollResults"=>"Show poll results",
@@ -77,11 +79,16 @@ class Lang
 		"errorNoVote"=>"Choose an option!",
 		"noPolls"=>"No polls",
 		"noPosts"=>"No posts",
+		"error404"=>"Error 404 - Page not found",
 		"notFound"=>"Specified post not available!",
 		"newTag"=>"New tag",
 		"tagRemoveConfirm"=>"Do you really want to remove that tag?",
 		"taggedWith"=>"Tagged",
-		"adjustEnvironment"=>"Adjust your environment!"
+		"adjustEnvironment"=>"Adjust your environment!",
+		"getSourceCode"=>"source code",
+		"connectionError"=>"",
+		"sessionError"=>"",
+		"noTitle"=>"Video not found",
 	);
 	
 	var $monthArray = Array("January","February","March","April","May","June","July","August","September","October","November","December");		 

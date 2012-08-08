@@ -1,5 +1,5 @@
 <?php
-
+	include_once("static/jsonwrapper/jsonwrapper.php");
 	class Util
 	{
 	var $langArr = array();
@@ -97,20 +97,50 @@
 }
 function _handle_URL_callback($matches)
 { // preg_replace_callback() is passed one parameter: $matches.
+	
+	
 	if (preg_match('/\.(?:jpe?g|png|gif)(?:$|[?#])/', $matches[0]))
 	{ // This is an image if path ends in .GIF, .PNG, .JPG or .JPEG.
 		return '<div class="imageWrapperContainer"><a class="fancybox" target="_blank" href="' . $matches[0] . '"><img class="thumbnail" ref="'. $matches[0] .'"></a></div>';
-	} // Otherwise handle as NOT an image.
-	//if(preg_match('/http:\/\/www\.youtube\.com\/watch\?v=[^&]+/', $matches[0], $xMatches)) {
-		
-		if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $matches[0], $xMatches))
-		{	
-			$type= 'youtube';
-			$videoID = $xMatches[1];
-			$html = '<div class="videoLink" style="background:url(http://img.youtube.com/vi/'.$xMatches[1].'/default.jpg) no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span>'.$matches[0].'</a></div>';
-			return $html; //"<a class='youtube' href='http://www.youtube.com/watch/?v=" . $xMatches[0] . "'>" . $xMatches[0] . "</a>";
+	} 
+	// Otherwise handle as NOT an image.
+	if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $matches[0], $xMatches))
+	{	
+		$type= 'youtube';
+		$videoID = $xMatches[1];
+		$oembed = getOembed("http://www.youtube.com/oembed?url=http%3A//www.youtube.com/watch%3Fv%3D".$videoID."&format=json");
+		$title = "";
+		if ($oembed)
+		{
+			$title = $oembed->title;
+			
 		}
-	//}
+		
+		$html = '<div class="videoLink" style="background:url(http://img.youtube.com/vi/'.$xMatches[1].'/default.jpg) no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span><strong>'.$title . "</strong><br>".$matches[0].'</a></div>';
+		return $html; //"<a class='youtube' href='http://www.youtube.com/watch/?v=" . $xMatches[0] . "'>" . $xMatches[0] . "</a>";
+	}
+	if (preg_match_all('#(http://vimeo.com)/([0-9]+)#i',$matches[0],$output))
+	{
+		$type='vimeo';
+		$videoID=$output[2][0];
+		
+		$oembed = getOembed("vimeo.com/api/v2/video/" . $videoID . ".json");
+		$thumb = $oembed->thumbnail_small;
+		$title = $oembed->title;
+		if (!$title) $title = $this->langArr["noTitle"];
+		$html = '<div class="videoLink" style="background:url('.$thumb.') no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span><strong>'.$title . "</strong><br>".$matches[0].'</a></div>';
+		return $html;
+	}
+	
+	// otherwise handle as normal LINK
 	return '<a target="_blank" class="styleColor" href="'. $matches[0] .'">'. $matches[0] .'</a>';
 }
-?>
+
+function getOembed($url)
+{
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$data = curl_exec($ch);
+	curl_close($ch);
+	return(json_decode($data));
+}

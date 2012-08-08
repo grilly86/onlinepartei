@@ -37,13 +37,12 @@
 			<a href="./" class="logo qtipTitle tooltipLeft" title="onlinepartei.eu"></a>
 			<span class="headerText">
 				<h2>onlinepartei.eu</h2>
-				SOCIAL DEMOCRATING PLATFORM<br>
-				(under development)
-			</span>   
+				Beta<br>
+				{$lang.pageSubTitle}
+			</span>
 			{if $slogan}
 			{include file='slogan.tpl'}
 			{/if}
-					<a href="http://www.github.com/grilly86/onlinepartei/" style="margin-left:15px;color:#fff;font-weight:bold;font-size:8pt;display:inline-block;text-align:center"><img src="static/img/github.png" alt="Github" target="_blank" title="{$lang.sourcecode}"/><br>Quellcode herunterladen</a>
 				{if $loggedIn}
 					<div class="menuUserItem">
 						{if $user.hasImage}
@@ -143,6 +142,9 @@
 					</a>
 				{/foreach}
 			</div>
+			<div id="connectionError">
+				{$lang.connectionError}
+			</div>
 		</div>
 		<button class="soundButton on styleColorBackground" title="{$lang.muteSound}"></button>
 		
@@ -239,8 +241,29 @@
 		{/if}
 		<br />
 		<a href="impressum.html" class="styleColor" style="float:right">{$lang.imprint}</a>
+		<a href="http://www.github.com/grilly86/onlinepartei/"  target="_blank" style="float:right;margin-right:10px;">{$lang.getSourceCode}</a>
+				
 		</div>
-		
+		<div id="sessionError">
+				<div class="sessionErrorWrapper"><a class="chatButton close" href="./"></a>
+					{$lang.sessionError}
+					<br clear="all" />
+					<div class="loginFormContainer styleColorBorder" style="float:left;margin-top:10px;">
+					<div class="titleContainer styleColorBackground"><span class="loginIcon"></span>{$lang.login}</div>
+					<form id="loginForm" class="loginForm" method="post" action="index.php?task=login">
+						<div id="loginErrorContainer" class="errorContainer">
+						{if $loginError}
+							{$loginError}
+						{/if}
+						</div>
+						<label for="username">{$lang.email}:</label><input class="text" type="text" name="username" id="loginUsername"><br clear="all" />
+						<label for="password">{$lang.password}:</label><input class="text" type="password" name="password" id="loginPassword">
+						<input type="submit" class="submit opButton" value="{$lang.login}">
+					</form>
+					
+				</div>
+			</div>
+		</div>
 		{$contents}
 		<div id="chatWindows">
 			{$chats}

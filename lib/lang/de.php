@@ -2,6 +2,7 @@
 class Lang
 {
 	var $languageArray=array(
+		"pageSubTitle"=>"SOZIALE POLITISIERUNGSPLATFORM",
 		"send"=>"Senden",
 		"save"=>"Speichern",
 		"done"=>"Fertig",
@@ -70,6 +71,7 @@ class Lang
 		"unmuteSound" => "Chat-Töne sind ausgeschaltet",
 		"pollQuestion"=>"Wie lautet Ihre Frage?",
 		"pollDescription"=>"Erläuternde Beschreibung",
+		"answer"=>"Antwort",
 		"noUsername"=>"<i>(kein Name)</i>",
 		"loginToVote"=>"Sie m&uuml;ssen sich anmelden um an Umfragen teilzunehmen!",
 		"showPollResults"=>"Umfrageergebnis anzeigen",
@@ -78,11 +80,16 @@ class Lang
 		"errorNoVote"=>"Wählen Sie einen Eintrag aus!",
 		"noPolls"=>"Keine Umfragen vorhanden",
 		"noPosts"=>"Keine Meldungen vorhanden",
+		"error404"=>"Fehler 404 - Seite nicht gefunden",
 		"notFound"=>"Die angegebene Meldung ist nicht vorhanden!",
 		"newTag"=>"Kennzeichnung hinzufügen",
 		"tagRemoveConfirm"=>"Wollen Sie diese Kennzeichnung wirklich entfernen?",
 		"taggedWith"=>"Markierung",
-		"adjustEnvironment"=>"Umgebung anpassen"
+		"adjustEnvironment"=>"Umgebung anpassen",
+		"getSourceCode"=>"Quellcode",
+		"connectionError"=>"<strong>Verbindungsfehler!</strong><br />Es wird versucht die Verbindung automatisch wiederherzustellen.",
+		"sessionError"=>"<strong>Session abgelaufen!</strong><br />Bitte loggen Sie sich erneut ein!",
+		"noTitle"=>"Video nicht gefunden.",
 		);
 	
 	var $monthArray = Array("J&auml;nner","Februar","M&auml;rz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember");		 
