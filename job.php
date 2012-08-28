@@ -2,7 +2,7 @@
 if (isset($_GET["action"]))
 {
 	$action = $_GET["action"];
-
+	ini_set('max_execution_time', 300);
 	include "lib/lang/lang.php";
 	$lang = new Language("de");
 	include "lib/util.php";

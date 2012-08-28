@@ -26,19 +26,19 @@
 }
 /* Facebook begin */
 .social_share_privacy_area .facebook {
-	width: 180px;
+	width: 150px;
 	display: inline-block;
 }
 .social_share_privacy_area .facebook .fb_like iframe {
-	width: 145px;
+	width: 115px;
 }
 /* Facebook end */
 /* Twitter begin */
 .social_share_privacy_area .twitter {
-	width: 148px;
+	width: 150px;
 }
 .social_share_privacy_area li div.tweet {
-	width: 115px;
+	width: 70px;
 }
 /* Twitter end */
 /* Google+ begin */

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Markdown Syntax - onlinepartei.eu</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<style type="text/css">
+			body
+			{
+				font-family:Arial,Hevetica,sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<ul>
+			<li>
+				<a href="#markdown">Markdown</a>
+				<ul>
+					<li><a href="#whatis">Was ist Markdown?</a></li>
+					<li>
+						<a href="#howto">Wie verwende ich Markdown</a>
+						<ul>
+							<li><a href="#absatz">Absatz</a></li>
+							<li><a href="#hervorhebung">Hervorhebungen</a></li>
+							<li><a href="#links">Verlinkungen</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		
+		<h1 id="markdown">Markdown</h1>
+		<h2 id="whatis">Was ist Markdown?</h2>
+		<p>
+			Markdown ist eine vereinfachte Auszeichnungssprache, mit dem Ziel, dass bereits die Ausgangsform leicht lesbar ist.
+			Daher wurde eine Auszeichnungssyntax gewählt, die bereits in Plaintext-Files und E-Mails gebräuchlich waren.
+		</p>
+		
+		<h2 id="howto">Wie verwende ich Markdown?</h2>
+		<p>
+			Auf onlinepartei.eu ist Markdown an allen Stellen implementiert, wo Formatierungen zulässig sind (also zB bei Meldungen und Chat-Nachrichten, aber zB <strong>nicht</strong> bei Benutzernamen).
+		</p>
+		
+		<h3 id="absatz">Absatz</h3>
+		<p>
+			Absätze werden durch <strong>Leerzeilen</strong> getrennt.<br />Aus:
+		</p>
+		<blockquote>
+		<pre>Normaler Text wird so dargestellt wie eingegeben.
+
+Eine Leerzeile erzeugt einen Absatz.
+		</pre>
+		</blockquote>
+		<p>Wird:</p>
+		<blockquote>
+			<p>
+				Normaler Text wird so dargestellt wie eingegeben.
+			</p>
+			<p>
+				Eine Leerzeile erzeugt einen Absatz.
+			</p>
+		</blockquote>
+		
+		<h3 id="hervorhebung">Hervorhebungen</h3>
+		<p>
+			Durch Sternchen oder Unterstrichen werden Hervorhebungen erreicht: ein Sternchen für kursiv, zwei Sternchen für fett und drei Sternchen für fett <em>und</em> kurzsiv:<br />
+			Aus:
+		</p>
+		<blockquote>
+			<pre>*Kursiv*, **Fett** und ***Fett kursiv***</pre>
+		</blockquote>
+		<p>bzw. (gleichbedeutend):</p>
+		<blockquote>
+			<pre>_Kursiv_, __Fett__ und ___Fett kursiv___</pre>
+		</blockquote>
+		<p>
+			Werden zu:
+		</p>
+		<blockquote>
+			<em>Kursiv</em>, <strong>Fett</strong> und <strong><em>Fett kursiv</em></strong>
+		</blockquote>
+		
+		<h3 id="links">Verlinkungen</h3>
+		<p>
+			Um Verlinkungen zu erstellen gibt es in Markdown mehrere Möglichkeiten:
+		</p>
+		<h4>Variante 1</h4>
+		<blockquote>
+			<pre>&lt;http://www.example.org/&gt;</pre>
+		</blockquote>
+		<p>
+			Erstellt einen einfachen klickbaren Link mit der Url als Linktext:
+		</p>
+		<blockquote>
+			<a target="_blank" href="http://www.example.org/">http://www.example.org/</a>
+		</blockquote>
+		
+		<h4>Variante 2</h4>
+		<blockquote>
+			<pre>[linktext](http://www.example.org)</pre>
+		</blockquote>
+		<p>
+			Erstellt einen klickbaren Link mit einem definierten Linktext:
+		</p>
+		<blockquote>
+			
+		</blockquote>
+	</body>
+</html>

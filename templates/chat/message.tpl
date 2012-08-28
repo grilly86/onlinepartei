@@ -5,7 +5,7 @@
 
 	<div class="message {if $item.senderid==$user.id}me {else}you {/if}" id="message_{$item.id}">
 		<div class="chatUsername styleColor {if $item.senderid==$user.id}me {else}you {/if}" style="float:{if $item.senderid==$user.id}left{else}right{/if}">
-			<span>{if $item.username}{$item.username}{else}{$lang.noUsername}{/if}</span><br>
+			{if $item.username}{$item.username}{else}{$lang.noUsername}{/if}<br>
 			{if $item.senderHasImage}<img src="uploads/p/{$item.senderid}.jpg" />{/if}
 		</div>
 	{/if}	

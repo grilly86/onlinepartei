@@ -7,7 +7,11 @@
 		</div>
 {else}
 <h2><a href="poll{$item.id}" class="styleColor">{$item.caption|@urldecode|@stripslashes}</a></h2>
-	<p style="margin-left:10px">{$item.message|@urldecode|@stripslashes}</p>
+	<div class="postMessageContainer" rel="post_{$item.id}">
+		<div class="message commentContainer {if ($item.userid==0||$item.userid==$user.id)}edit{/if}" rel="poll_{$item.id}" ref="{$item.message}">
+		{$item.messageHtml|@urldecode|@stripslashes}
+		</div>
+	</div>
 	{if $loggedIn}
 		<form class="pollVoteForm" id="pollForm{$item.id}"name="pollForm{$item.id}" method="post">
 			{assign var=x value=0}
@@ -125,6 +129,14 @@
 	</table>
 	<div id="graph{$item.id}" class="graphContainer"></div>
 	{if !$loggedIn}
+		{assign var=x value=0}
+		{foreach from=$item.answer item=answer}
+		<label class="disabled">
+			<input disabled type="radio" name="vote{$item.id}" {if $item.isVoted && $item.uservote==$x}checked="checked"{/if} value="{$x}" {if $item.isVoted}disabled="disabled"{/if} />
+			{$answer.text|@urldecode|@stripslashes}
+		</label>
+		{assign var=x value=$x+1}
+		{/foreach}
 		<p class="small indent">{$lang.loginToVote}</p>
 	{/if}
 	{include file='post/postFooter.tpl'}

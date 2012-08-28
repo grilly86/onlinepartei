@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 3.4.5
 -- http://www.phpmyadmin.net
 --
@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `message` (
   `senderID` int(11) NOT NULL DEFAULT '0',
   `receiverID` int(11) NOT NULL DEFAULT '0',
   `message` text NOT NULL,
+  `messageHtml` text NOT NULL,
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `read` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `poll` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `question` text NOT NULL,
   `text` text NOT NULL,
+  `messageHtml` text NOT NULL,
   `answers` text NOT NULL,
   `userID` int(11) NOT NULL DEFAULT '0',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -79,6 +81,7 @@ CREATE TABLE IF NOT EXISTS `post` (
   `userID` int(11) NOT NULL DEFAULT '0',
   `caption` text NOT NULL,
   `message` text NOT NULL,
+  `messageHtml` text NOT NULL,
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `deleted` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -159,7 +162,3 @@ CREATE TABLE IF NOT EXISTS `user` (
   `language` enum('de','en') NOT NULL DEFAULT 'de',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

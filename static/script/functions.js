@@ -1,19 +1,20 @@
-	var drag=false;
-	var dragContainer;
-	var dragXPos=0,dragXStart=0;
-	var dragYPos=0,dragYStart=0;
-	var resize=false;
-	var resizeContainer; 
-	var resizeXPos=0, resizeXStart=0;
-	var resizeYPos=0, resizeYStart=0;
-	var allTimer, chatTimer= new Array();
-	var onlineTimer;
-	var blinkTimer;
-	var channelAllFrequency = 15000; // Alle X Sekunden wird nach neuen
-									// Post von allen Benutzern gefragt.
-	var channelChatFrequency = 4000;		// Wenn ein Chat-Fenster geöffnet 
-									// wird alle X Sekunden nach neuen 
-									// Posts gefragt.
+var drag=false;
+var dragContainer;
+var dragXPos=0,dragXStart=0;
+var dragYPos=0,dragYStart=0;
+var resize=false;
+var resizeContainer; 
+var resizeXPos=0, resizeXStart=0;
+var resizeYPos=0, resizeYStart=0;
+var allTimer, chatTimer= new Array();
+var onlineTimer;
+var blinkTimer;
+/* "small" polling */
+var channelAllFrequency = 15000; // Alle X Sekunden wird nach neuen
+								 // Post von allen Benutzern gefragt.
+var channelChatFrequency = 6000; // Wenn ein Chat-Fenster geöffnet 
+								 // wird alle X Sekunden nach neuen 
+								 // Posts gefragt.
 var limitFrom=0;
 var limitCount=20;
 var postCount=0;
@@ -21,8 +22,7 @@ var muteSound = false;
 
 var ajaxHandler;
 function getPosts(limit,order,parent)
-{	
-	
+{
 	$("a.loading").remove();
 	var limitString="", orderString="";
 	
@@ -586,6 +586,7 @@ $().ready(function() {
 	
 	function sendComment(that)
 	{
+		$(that).attr("disabled","disabled").addClass("disabled");
 		var parentID=0;
 		var isNew = false;
 		var id = 0;
@@ -594,29 +595,41 @@ $().ready(function() {
 		if ($(that).hasClass("edit"))
 		{
 			//edit
-			id = $(that).parent().attr("rel").substr(5);
-			if ($(that).parent().parent().parent().hasClass("postContainer"))
+			var rel = $(that).parent().attr("rel");
+			id = rel.substr(5);
+			type = rel.substr(0,4);
+			if (type=="poll")
 			{
-				parentID = parseInt($(that).parents(".postContainer").attr("rel").substr(5));
-				obj = $("div.message[rel=post_"+parentID+"]").parent();
+				parentID=id;
+				typeDataString = "&type=" + type;
+				obj = $(that).parent().parent().parent();
 			}
 			else
 			{
-				parentID=id;
-				obj = $(that).parent().parent();
+				if ($(that).parent().parent().parent().hasClass("postContainer"))
+				{
+					parentID = parseInt($(that).parents(".postContainer").attr("rel").substr(5));
+					obj = $("div.message[rel=post_"+parentID+"]").parent();
+				}
+				else
+				{
+					parentID=id;
+					obj = $(that).parent().parent();
+				}
 			}
 		}
 		else
 		{
 			//new 
 			isNew = true;
-			parentID = parseInt($(that).parent().parent().attr("rel").substr(5));
-			type = $(that).parent().parent().attr("rel").substr(0,4);
+			var rel=$(that).parent().parent().attr("rel")
+			
+			parentID = parseInt(rel.substr(5));
+			type = rel.substr(0,4);
 			if (type=="poll")
 			{
 				typeDataString = "&type=" + type;
 			}
-			
 		}
 		if (parentID>0)
 		{
@@ -640,7 +653,6 @@ $().ready(function() {
 						var commentCount = parseInt($(commentCountContainer).attr("rel"))-1;
 						$(commentCountContainer).attr("rel",commentCount).html(commentCount);
 					}
-					
 					var scrollStore = $(document).scrollTop();
 					if ($(obj).hasClass("commentWrapper"))
 					{
@@ -648,7 +660,14 @@ $().ready(function() {
 					}
 					else if($(obj).hasClass("postContainer"))
 					{
-						$(obj).html(data);
+						if (type == 'poll')
+						{
+							$(obj).replaceWith(data);
+						}
+						else
+						{
+							$(obj).html(data);
+						}
 					}
 					else if ($(obj).hasClass("postMessageContainer"))
 					{
@@ -665,7 +684,7 @@ $().ready(function() {
 							$(obj).remove();
 						});
 					}
-					initializeFancybox(data);
+					initializeFancybox($(".commentContainer[rel=" + type + "_" + id + "]"));
 					scrollToPos(scrollStore);
 				}
 			});
@@ -952,8 +971,7 @@ $().ready(function() {
 		{
 			if ($(".newPostForm.poll").is(":visible"))
 			{
-				$(".newPostForm.poll").removeClass("show");
-				$(this).removeClass("active");
+				$("#pollQuestion").focus();
 			}
 			else
 			{
@@ -961,6 +979,7 @@ $().ready(function() {
 				$(".newPostForm.poll").addClass("show");
 				$(".addPost").removeClass("active");
 				$(this).addClass("active");
+				$("#pollQuestion").focus();
 			}
 		}
 		return false;
@@ -968,16 +987,8 @@ $().ready(function() {
 	$("a.addPost.post").live("click", function(e) {
 		if ($(".newPostForm.post").is(":visible"))
 		{
-			if ($(this).hasClass("active"))
-			{
-				$(".newPostForm.post").removeClass("show");
-				$(this).removeClass("active");
-			}
-			else
-			{
+				$("#postMessage").focus();
 				$(this).addClass("active");
-				$("#statusMessage").focus();
-			}
 		}
 		else
 		{
@@ -1096,8 +1107,10 @@ $().ready(function() {
 		}
 	});
 	$("a.nextSlogan").live("click",function() {
+		$(this).addClass("spinrev");
+		var currentSlogan = parseInt($(this).parent().attr("rel"));
 		$.ajax({
-			url:"slogan",
+			url:"slogan?id=" + currentSlogan,
 			success:function(data){
 					$("div.slogan").replaceWith(data);
 				}
@@ -1345,33 +1358,32 @@ function initializeChat(that)
 }
 function initializeFancybox(obj)
 {
-	if ($(obj).find(".commentContainer.message.edit").length){
-		$(obj).find(".chatButtonContainer").remove();
-		
-	}
+	$(obj).find("a.fancybox").fancybox({type:"image"});
 	$(obj).find("a.fancybox").each(function() {
+		if ($(this).find("img").height()>0) {
+			$(this).find("img").addClass("loaded");
+			$(this).attr("src", $(this).attr("ref"));
+		}
 		$(this).find("img:not(.loaded)").each(function() {
 			$(this).load(function() {
 				if ($(this).height()>=99)
 				{
-					$("a.fancybox:not(.small)").fancybox({
-						type:'image'
-					});
+					$(this).addClass("loaded");//.parent().fancybox();
 				}
 				else
 				{
-					$(this).parent().click(function(e) {
+					$(this).addClass("loaded").parent().click(function(e) {
 						e.preventDefault();
 						return false;
 					}).addClass("small");
 				}
-				$(this).addClass("loaded");
+				
 			}).error(function() {
 				$(this).parent().remove();
 			});
 			$(this).attr("src", $(this).attr("ref"));
 		});
-	}); 
+	});
 
 }
 var newChatMessage=false;
@@ -1422,6 +1434,7 @@ function channelAll()
 		{
 			if (parseInt(data)!==-1)
 			{
+				$("#chatUserList").show();$("#connectionError").hide();
 				var obj = eval("(" + data + ")");
 				
 				if (obj["userList"]!=userListStore)
@@ -1445,7 +1458,16 @@ function channelAll()
 					messageCount[obj["obj"][newUser]["senderid"]]=obj["obj"][newUser]["messageCount"];
 				}
 			}
+			else
+			{
+				showSessionError();
+			}
 			allTimer = setTimeout("channelAll()",channelAllFrequency);
+		},
+		error:function()
+		{
+			showConnectionError();
+			allTimer = setTimeout("channelAll()",20000);
 		}
 	});
 }
@@ -1852,4 +1874,16 @@ function rand(min,max) {
 	while(r == 1.0);
 
 	return min + parseInt(r * (max-min+1));
+}
+
+
+function showConnectionError()
+{
+	$("#chatUserList").slideUp();
+	$("#connectionError").slideDown();
+}
+
+function showSessionError()
+{
+	$("#sessionError").fadeIn();
 }

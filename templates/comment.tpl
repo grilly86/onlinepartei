@@ -11,4 +11,4 @@
 {/foreach}
 {/if}
 <textarea name="comment" class="messageComment empty">{$lang.commentBlank}</textarea>
-<div class="notice">{if !$loggedIn}{$lang.anonymousComment}{else}{$lang.holdShiftToBreak}{/if}</div>
+<div class="notice">{if !$loggedIn}{$lang.anonymousComment}<br>{$lang.holdShiftToBreak}{else}{$lang.holdShiftToBreak}{/if}</div>

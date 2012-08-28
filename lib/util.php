@@ -1,5 +1,9 @@
 <?php
 	include_once("static/jsonwrapper/jsonwrapper.php");
+	include_once("static/markdown.php");
+	
+	define("ALLOWED_TAGS", "<a><b><p><strong><em><h1><h2><h3><h4><h5><h6><br><img><div><span><code><blockquote><pre><table><tr><td><th>");
+	
 	class Util
 	{
 	var $langArr = array();
@@ -53,35 +57,16 @@
 	}
 
 	function makeLinks ($htmlText) {
-		$htmlText = str_replace(array("http://www.","https://www."),"www.",$htmlText);
-		$htmlText = str_replace("www.","http://www.",$htmlText);
-		$htmlText = $this->parseUbb($htmlText);
-		$htmlText = $this->convertPost($htmlText);
-		$htmlText = nl2br($htmlText);
+		
+		$htmlText = $this->convertPost($htmlText);	
+		$htmlText = Markdown($htmlText);
+		$htmlText = strip_tags($htmlText,ALLOWED_TAGS);
 		return $htmlText;
 	}
 
-	function parseUbb ($str)
-	{
-		//$str=str_replace("[hr]","<hr size=\"1\" noshade>",$str);
-		$str=preg_replace("/\[b\](.*?)\[\/b\]/si","<b>\\1</b>",$str);
-		$str=preg_replace("/\[i\](.*?)\[\/i\]/si","<i>\\1</i>",$str);
-		$str=preg_replace("/\[u\](.*?)\[\/u\]/si","<u>\\1</u>",$str);
-		$str=preg_replace("/\[-\](.*?)\[\/-\]/si","<span class=\"strikethrough\">\\1</span>",$str);
-		//$str=preg_replace("/\[cn\](.*?)\[\/cn\]/si","<center>\\1</center>",$str);
-		$str=preg_replace("/\[bq\](.*?)\[\/bq\]/si","<blockquote>\\1</blockquote>",$str);
-		//$str=preg_replace("/\[img=(.*?)\]/si","<img src=\"\\1\" border=\"0\">",$str);
-		//$str=preg_replace("/\[img\](.*?)\[\/img\]/si","<img src=\"\\1\" border=\"0\">",$str);
-		$str=preg_replace("/\[url=(.*?)\](.*?)\[\/url\]/si","<a href=\"\\1\" target=\"_blank\" class=\"styleColor\">\\2</a>",$str);
-		$str=preg_replace("/\[quote](.*?)\[\/quote\]/si","<blockquote>\\1</blockquote>",$str);
-		//$str=preg_replace("/\[quote=(.*?)\](.*?)\[\/quote\]/si","<blockquote><i><b>Originally posted by \\1:</b><br>\\2</i></blockquote>",$str);
-		return $str;
-	}
-	
 	function convertPost($post)
 	{ // Disclaimer: This "URL plucking" regex is far from ideal.
-		$pattern = '`((?:https?|ftp)://\S+[[:alnum:]]/?)`si';
-		$pattern = '`((?:https?|ftp)://\S+[[:alnum:]]/?)`si';
+		$pattern = '`(?<!\(|\<)((?:https?|ftp)://\S+[[:alnum:]]/?)(?!\)|\>)`si';
 		$replace='_handle_URL_callback';
 		return preg_replace_callback($pattern,$replace, $post);
 	}
@@ -110,12 +95,7 @@ function _handle_URL_callback($matches)
 		$videoID = $xMatches[1];
 		$oembed = getOembed("http://www.youtube.com/oembed?url=http%3A//www.youtube.com/watch%3Fv%3D".$videoID."&format=json");
 		$title = "";
-		if ($oembed)
-		{
-			$title = $oembed->title;
-			
-		}
-		
+		if ($oembed) $title = $oembed->title;
 		$html = '<div class="videoLink" style="background:url(http://img.youtube.com/vi/'.$xMatches[1].'/default.jpg) no-repeat left;"><a target="_blank" href="'.$matches[0].'"><span class="videoIcon"></span><strong>'.$title . "</strong><br>".$matches[0].'</a></div>';
 		return $html; //"<a class='youtube' href='http://www.youtube.com/watch/?v=" . $xMatches[0] . "'>" . $xMatches[0] . "</a>";
 	}

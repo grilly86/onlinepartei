@@ -13,7 +13,7 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 * 2-click social media plugin
 
 ## Technical overview
-* **PHP** with **Smarty Template Engine** is used
+* **PHP 4.4.8** (until newer server is found) with **Smarty Template Engine** is used
 * MySQL database is used. You can find the database structure in the `DATABASE_STRUCTURE.SQL`
 * JQuery is used as JavaScript framework, couple of plugins: `jquery.fancybox`, `jquery.farbtastic`, `jquery.cookie`, `jquery.socialshareprivacy`, `jquery.jplayer`, `jquery.validate`
 * RaphaelJS is used to draw the poll results
@@ -31,5 +31,3 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 * More users! More ideas on how the project should envolve!
 * If you copy the source code to run your own website with it, I would be glad if you let me know - mail to grilly86@gmail.com f.e.
 * More discussion on what's going on!
-* Love
-* Peace

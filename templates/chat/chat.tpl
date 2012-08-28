@@ -7,6 +7,6 @@
 	<div class="messageContainer" id="messageContainer{$user.id}">
 		<img class="loader" src="static/img/loader.gif" />
 	</div>
-	<textarea class="chatAnswer" name="message" title="{$lang.holdShiftToBreak}" noresize></textarea>
+	<textarea class="chatAnswer" name="message" title="{$lang.holdShiftToBreak_nolink}" noresize></textarea>
 	<span class="resizeHandle"></span>
 </div>
