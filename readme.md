@@ -26,6 +26,7 @@ The page that is motorized by this code can be found here: http://onlinepartei.e
 * Make post captions and polls editable
 * Make chat messages editable
 * Optimize for smart phones
+* Extend documentation
 
 ## What we need!
 * More users! More ideas on how the project should envolve!
