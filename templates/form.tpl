@@ -43,12 +43,52 @@
 	
 	<!--<input type="hidden" id="postCount" value="{$postCount}" />-->
 	<div class="listFilterContainer">
-		<!--<label for="searchInput">Filter:</label>
-		<input type="text" name="search" id="searchInput">-->
-		<a class="sortLink desc">
-			{$lang.newest}
+		<!--input class="searchField styleColorBorder" type="text" name="search" id="searchInput" placeholder="{$lang.search}" /-->
+		<a class="sortLink desc styleColor styleColorBorder" rel="{if $sort}{$sort}{else}newest{/if}">
+			{if $sort=="mostliked"}{$lang.mostliked}{else}{$lang.newest}{/if}
 			<span class="arrow desc"></span>
 		</a>
+		<div class="sortOptions">
+			<a class="" href="./"rel="newest">{$lang.newest}</a>
+			<a class="" href="liked" rel="mostliked">{$lang.mostliked}</a>
+		</div>
+		{literal}
+		<script type="text/javascript">
+			$(".sortLink.desc").click(function() {
+				$("div.sortOptions").show();
+			});
+			$(".sortOptions").find("a").click(function(e) {
+				$(".sortLink").html($(this).html() + '<span class="arrow desc"></span>').attr("rel", $(this).attr("rel"));
+				$(".sortOptions").fadeOut();
+					
+				if (history.pushState)
+				{
+					var url = ".";
+					if ($(this).attr("rel") == "mostliked")
+					{
+						url = "liked";
+					}
+					history.pushState(null, "onlinepartei.eu", url);
+					getList();
+					e.preventDefault();
+					return false;
+				}
+			});
+			function getList()
+			{
+				$(".postContainer").remove();
+				var sort = $(".sortLink").attr("rel");
+				$.ajax({
+					url:"sort",
+					type:"get",
+					data:"sort=" + sort,
+					success:function(data) {
+						$(".contentWrapperContainer").append(data);
+					}
+				});
+			}
+		</script>
+		{/literal}
 	</div>
 	<!-- posts are listed here: -->
 	{if $TPL_POSTS}

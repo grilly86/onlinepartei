@@ -9,7 +9,6 @@
 
 	class Workspace
 	{
-
 		var $task="";
 		var $user = array();
 		var $util;
@@ -60,6 +59,28 @@
 				$this->smarty->assign("lang", $this->langArr);
 				switch($this->task)
 				{
+					case "sort":
+						include_once "lib/util.php";
+						$this->util = new Util($lang);
+						if (isset($_GET["sort"]))
+						{
+							$sort = $_GET["sort"];
+							$obj = array();
+							if ($sort == "mostliked")
+							{
+								$obj = $this->getPostList('',"sortRatio DESC",'0,30');
+							}
+							else
+							{
+								$obj = $this->getPostList();
+							}
+							$this->smarty->assign("sort",$sort);
+							$this->smarty->assign("list", $obj);
+							
+							$this->smarty->assign("user", $this->user);
+							die( $this->smarty->fetch("post/list.tpl"));
+						}
+						break;
 					case "slogan":
 						include_once "lib/util.php";
 						$this->util = new Util($lang);
@@ -409,12 +430,13 @@
 							$unrate = isset($_POST["unrate"]);
 							$timestamp = date("Y-m-d H:i:s");
 							$type = "";
-							$typeWhere ="";
+							$typeWhere =" AND `type`='' ";
 							if (isset($_POST["type"]))
 							{
 								$type = $_POST["type"];
-								$typeWhere = " AND type='".$type."' ";
+								$typeWhere = " AND `type`='poll ";
 							}
+			
 							$sql = "SELECT rating FROM rating WHERE userID=" . $userID . " AND postID=" . $postID . $typeWhere;
 							$rs = mysql_query($sql) or die(mysql_error());
 							if (mysql_num_rows($rs))
@@ -434,8 +456,20 @@
 								// INSERT
 								$sql = "INSERT rating (postID,userID,rating,timestamp,type) VALUES (".$postID.",".$userID.",'".$rating."','".$timestamp."','".$type."')";
 							}
-
 							$rs = mysql_query($sql) or die(mysql_error());
+							
+							//update numbers in post table (and poll table)
+							$sql = "SELECT SUM(rating='like') as `like`,SUM(rating='dislike') as dislike FROM rating WHERE postID=" . $postID . $typeWhere;
+							$rs = mysql_query($sql) or die(mysql_error());
+							if ($row = mysql_fetch_assoc($rs))
+							{
+								$sortRatio = $row['like']/($row['like']+$row['dislike'])*$row['like']*2 - $row['dislike']/($row['like']+$row['dislike'])*$row['dislike'];
+								
+								if (!$type) $type="post";
+								
+								$sql = "UPDATE " . $type . " SET sortLike='".$row['like']."', sortDislike='".$row['dislike']."',sortRatio='".$sortRatio."' WHERE id=" . $postID;
+								mysql_query($sql) or die(mysql_error());
+							}
 						}
 						die();
 						break;
@@ -772,6 +806,7 @@
 								//$message = str_replace("||plus||", "+", $_POST["message"]);
 								$message = $this->config->convertToDatabase($_POST["message"]);
 								$messageHtml = $this->config->convertToDatabase(urlencode($this->util->makeLinks(urldecode($_POST["message"]))));
+							
 								//echo "<pre>" . $message . "</pre>";
 								$id=0;
 								if (isset($_POST["id"]) && $_POST["id"]>0)
@@ -867,7 +902,6 @@
 							break;
 						}
 					case "getPosts":
-
 						if (!isset($getPost))
 						{
 							include_once "lib/util.php";
@@ -883,7 +917,15 @@
 								{
 									$limit = $_REQUEST["limit"];
 								}
-								$obj = $this->getPostList((int)$parent,'timestamp DESC' , $limit);
+								$sort = "timestamp DESC";
+								if (isset($_REQUEST["sort"]))
+								{
+									if ($_REQUEST["sort"] == "mostliked")
+									{
+										$sort = "sortRatio DESC";
+									}
+								}
+								$obj = $this->getPostList((int)$parent,$sort, $limit);
 								$this->smarty->assign("user",$this->user);
 								$this->smarty->assign("list",$obj);
 								die($this->smarty->fetch("post/list.tpl"));
@@ -947,8 +989,15 @@
 					default:
 						include_once "lib/util.php";
 						$this->util=new Util($lang);
-						//$obj = array();
-						//$obj = $this->getPostList("post.postID=0");
+						
+						if (isset($_GET['sort']))
+						{
+							$sort = $_GET['sort'];
+							if ($sort == "mostliked")
+							{
+								$this->smarty->assign("sort",$sort);
+							}
+						}
 						$this->smarty->assign("user",$this->user);
 						$sql = "SELECT count(id) FROM post WHERE postID=0 AND deleted=0";
 						$rs = mysql_query($sql) or die(mysql_error());
@@ -1098,7 +1147,7 @@
 			$sql="";
 			if ($withPost)
 			{
-				$sql =	"SELECT post.id as id, post.postID as postid, post.caption as caption, post.message as message,post.messageHtml as messageHtml,  post.timestamp as `timestamp`,post.message as answers, '0' as poll,user.name as username, user.id as userid, user.hasImage as hasImage,post.type as pType " . 
+				$sql =	"SELECT post.id as id, post.postID as postid, post.caption as caption, post.message as message,post.messageHtml as messageHtml,  post.timestamp as `timestamp`,post.message as answers, '0' as poll,user.name as username, user.id as userid, user.hasImage as hasImage,post.type as pType, post.sortLike as `like`, post.sortDislike as dislike, post.sortRatio as sortRatio " . 
 						"FROM post " . 
 							"LEFT JOIN user ON user.id=post.userid " . 
 							"LEFT JOIN post_tag as pt ON post.id=pt.parentID AND pt.type='' " . 
@@ -1109,7 +1158,7 @@
 			{
 				if ($withPost)	$sql .= " UNION ";
 				
-				$sql .="SELECT poll.id as id, '0' as postid, poll.question as caption, poll.text as message,poll.messageHtml as messageHtml,poll.timestamp as `timestamp`, poll.answers as answers, '1' as poll, user.name as username, user.id as userid, user.hasImage as hasImage, '' as pType " . 
+				$sql .="SELECT poll.id as id, '0' as postid, poll.question as caption, poll.text as message,poll.messageHtml as messageHtml,poll.timestamp as `timestamp`, poll.answers as answers, '1' as poll, user.name as username, user.id as userid, user.hasImage as hasImage, '' as pType, poll.sortLike as `like`, poll.sortDislike as dislike, poll.sortRatio as sortRatio " . 
 							"FROM poll " . 
 							"LEFT JOIN user ON user.id=poll.userid " . 
 							"LEFT JOIN post_tag as pt ON poll.id=pt.parentID AND pt.type='poll' " . 
@@ -1118,7 +1167,6 @@
 						
 			}
 			$sql .= " GROUP BY id,poll ORDER BY " . $order . $sqlLimit;
-			//echo "<br><br>" . $sql . "<br><br>";
 			$rs = mysql_query($sql) or die(mysql_error());
 			$obj = array();
 			while ($row = mysql_fetch_assoc($rs))
@@ -1186,12 +1234,17 @@
 					}
 					//print_r($row['answer']);
 				}
-				
 				if ($this->user)
 				{	// with myRating
-					$sql = "SELECT SUM(r.rating='like') as `like`, SUM(r.rating='dislike') as `dislike`, myRating.rating as myRating FROM rating r LEFT JOIN rating myRating ON myRating.postID=".$row["id"]. " AND myRating.`type`='".$row['type']."' AND myRating.userID=".$this->user["id"]." WHERE r.postID=" . $row["id"] . " AND r.`type`='".$row['type']. "' GROUP BY r.postID";
+					$sql = "SELECT rating as myRating FROM rating WHERE postID=".$row["id"]. " AND `type`=".($row['type']?2:1)." AND userID=".$this->user["id"];
+					$rsRating = mysql_query($sql) or die(mysql_error());
+					if ($rowRating = mysql_fetch_assoc($rsRating))
+					{
+						$row["myRating"] = $rowRating["myRating"];
+					}
+					
 				}
-				else
+				/*else
 				{
 					//without myRating
 					$sql = "SELECT SUM(r.rating='like') as `like`, SUM(r.rating='dislike') as `dislike` FROM rating r WHERE r.postID=" . $row["id"] . " AND r.`type`='".$row['type']."' GROUP BY r.postID";
@@ -1207,14 +1260,11 @@
 					{	$row["dislike"] = (int)$rowRating["dislike"]; }
 					else
 					{	$row["dislike"]=0;	}
-					if (isset($rowRating["myRating"]))
-					{
-						$row["myRating"] = $rowRating["myRating"];
-					}
+					
 
-				}
+	
 				else
-				{ $row["like"]=0;$row["dislike"]=0; }
+				{ $row["like"]=0;$row["dislike"]=0; }*/
 				$sum = $row["like"] + $row["dislike"];
 				if ($sum)
 				{

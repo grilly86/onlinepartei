@@ -6,7 +6,7 @@ textarea,body
 }
 body
 {
-	background:#ccc;
+	background:#ddd;
 	padding:0;margin:0px 3px;
 	min-width:400px;
 }
@@ -881,7 +881,7 @@ float:left;
 	border-radius: 6px;
 	border:2px solid {/literal}{$styleColor}{literal};
 	box-shadow:0 1px 4px rgba(0,0,0,0.3);
-
+	
 }
 .contentContainer h2 
 {
@@ -891,7 +891,8 @@ float:left;
 {
 	font-family:"Georgia", "Times New Roman", serif;
 	color:#333;
-	cursor:pointer;	
+	fon-size:11pt;
+	cursor:pointer;
 	padding:4px 8px;
 	display:inline-block;
 	border-radius: 4px 4px 0 0;
@@ -920,10 +921,17 @@ float:left;
 {
 	background-color:{/literal}{$styleColor}{literal};
 }
-.postContainer .message h2,.postContainer .message h2:hover
+.postContainer .message h2,.postContainer .message h2:hover,
+.postContainer .message h3,
+.postContainer .message h4,
+.postContainer .message h5,
+.postContainer .message h6
+
 {
+	margin:0;
 	padding:0 0 4px 0;
 	cursor:default;
+	font-size:11pt;
 	text-decoration:none;
 }
 .postContainer.active h2
@@ -991,14 +999,25 @@ float:left;
 
 .listFilterContainer
 {
+	clear:both;
+	position:relative;
 	margin-top:20px;
-	height:14px;
+	height:36px;
+}
+.listFilterContainer .searchField
+{
+	padding: 4px 5px;
+	border-radius:4px;
+	box-shadow:1px 2px 5px rgba(0,0,0,0.2) inset;
+	border:2px solid {/literal}{$styleColor}{literal};
+	font-family:Georgia,Times New Roman,serif;
+	width:300px;
 }
 .sortLink
 {
 	position:relative;
 	border:2px solid {/literal}{$styleColor}{literal};
-	border-color:#ccc; /* deac*/
+	border-color:{/literal}{$styleColor}{literal};
 	background-color:#fff;
 	padding:3px 10px 3px 10px;
 	float:left;
@@ -1011,7 +1030,7 @@ float:left;
 .sortLink.asc,.sortLink.desc
 {
 	padding:3px 30px 3px 10px;
-	color: #ccc; /* deac */
+	color: {/literal}{$styleColor}{literal};
 	font-weight:bold;
 }
 .sortLink.asc
@@ -1027,7 +1046,26 @@ float:left;
 	text-decoration:none;
 	background-color:#fff;
 }
-
+.sortOptions
+{
+	display:none;
+	position:absolute;
+	right:0;
+	z-index:30;
+	background:#fff;
+	margin-top:28px;
+	border:2px solid {/literal}{$styleColor}{literal};
+	border-radius:5px;
+}
+.sortOptions a
+{
+	display:block;
+	width:70px;
+	padding:5px 8px;
+	color:{/literal}{$styleColor}{literal};
+	cursor:pointer;
+	
+}
 span.arrow
 {
 	position:absolute;
@@ -1044,7 +1082,7 @@ span.arrow.asc
 span.arrow.desc
 {
 	border:5px solid;
-	border-color: #aaa transparent transparent;
+	border-color: {/literal}{$styleColor}{literal} transparent transparent;
 }
 
 a.like,a.dislike
@@ -1760,6 +1798,7 @@ span.strikethrough
 	display:block;
 	float:none;
 	width:auto;
+	font-family:Georgia,Times New Roman,serif;
 }
 p.small
 {
@@ -1976,7 +2015,7 @@ h1.tagline span.tagicon
 {
 	position:absolute;
 	left:0;
-	background:url(static/img/tag.png) center {/literal}{$styleColor}{literal};
+	background:url(static/img/tag.png) center;
 	display:inline-block;
 	width:24px;
 	height:24px;

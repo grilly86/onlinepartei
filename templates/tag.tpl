@@ -8,7 +8,9 @@
 	{include file='post/post.tpl'}
 {/foreach}
 {else}
+	<div class="postContainer" style="padding:10px;">
 	{$lang.noPosts}
+	</div>
 {/if}
 
 </div>

@@ -7,7 +7,7 @@
 		<span class="votingBar left {if $item.percent == '-' }deac{/if} styleColorBackground" style="width:{$item.votingBarWidth}px"></span>
 	</div>
 	<a class="dislike {if $item.myRating=='dislike'}active{/if} {if !$loggedIn}fix{/if} styleColorBackground styleColorBorder" title="{if !$loggedIn}{$lang.logInToRate}{else}{$lang.dislike}{/if}" ref="{$item.dislike}"></a>
-	<a class="footerButton comment {if $item.commentsHtml}active styleColorBackground{else}styleColor{/if} styleColorBorder" href="p{$item.id}" title="{if ($item.comments>0)}{$lang.clickToComments}{else}{$lang.clickToComment}{/if}">
+	<a class="footerButton comment {if $item.commentsHtml}active styleColorBackground{else}styleColor{/if} styleColorBorder " href="p{$item.id}" title="{if ($item.comments>0)}{$lang.clickToComments}{else}{$lang.clickToComment}{/if}">
 		<span class="icon comment styleColorBackground"></span>
 		<span class="count " rel="{$item.comments}">
 		{if !$item.comments}

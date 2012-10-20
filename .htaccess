@@ -1,12 +1,21 @@
 php_value register_globals 0
 
 RewriteEngine on
+RewriteCond %{HTTP_HOST} ^onlinepartei.eu$
+RewriteRule ^(.*)$ http://www.onlinepartei.eu/$1 [R=301]
+
+# WICHTIG AUFGRUND PHP LUECKE
+RewriteCond %{QUERY_STRING} ^[^=]*$
+RewriteCond %{QUERY_STRING} %2d|\- [NC]
+RewriteRule .? - [F,L] 
 
 RewriteRule ^style.css$ style.php [L]
 
 RewriteRule ^chat/message$ chat.php?task=message&%{QUERY_STRING} [L]
 RewriteRule ^chat$ chat.php?%{QUERY_STRING} [L]
 
+RewriteRule ^polls$ index.php?task=polls&%{QUERY_STRING} [L]
+RewriteRule ^poll([\d]+)$ index.php?task=polls&id=$1&%{QUERY_STRING} [L]
 RewriteRule ^settings$ index.php?task=settings&%{QUERY_STRING} [L]
 RewriteRule ^logout$ index.php?task=logout&%{QUERY_STRING} [L]
 RewriteRule ^u([\d]+)$ index.php?task=profile&id=$1&%{QUERY_STRING} [L]
@@ -14,3 +23,10 @@ RewriteRule ^all$ index.php?task=getPosts&%{QUERY_STRING} [L]
 RewriteRule ^p([\d]+)$ index.php?task=showPost&id=$1&%{QUERY_STRING} [L]
 RewriteRule ^comments$ index.php?task=getComments&%{QUERY_STRING} [L]
 RewriteRule ^sendComment$ index.php?task=sendComment&%{QUERY_STRING} [L]
+RewriteRule ^tag$ index.php?task=tag&%{QUERY_STRING} [L]
+RewriteRule ^tag/([^/]*)$ index.php?task=tag&name=$1&%{QUERY_STRING} [L]
+RewriteRule ^slogan$ index.php?task=slogan&%{QUERY_STRING} [L]
+RewriteRule ^sort$ index.php?task=sort&%{QUERY_STRING} [L]
+
+# Orderings 
+RewriteRule ^liked$ index.php?sort=mostliked%{QUERY_STRING} [L]

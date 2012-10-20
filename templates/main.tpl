@@ -26,7 +26,7 @@
 		<script type="text/javascript" src="static/script/jquery.validate.min.js" ></script>
 		<script type="text/javascript" src="static/script/socialshareprivacy/jquery.socialshareprivacy.min.js"></script>
 		<script type="text/javascript" src="static/script/fancybox/jquery.fancybox.pack.js"></script>
-		<script type="text/javascript" src="static/script/functions.js" ></script>
+		<script type="text/javascript" src="static/script/functions.js"></script>
 		
 		<title>{$pageTitle}</title>
 	</head>
@@ -54,10 +54,6 @@
 				<a href="settings" class="menuButton settings qtipTitle {$settingsActive}" title="{$lang.settings}"></a>
 				{/if}
 				
-				
-				<a href="polls" class="menuButton polls qtipTitle {$pollsActive}" title="{$lang.polls}"></a>
-				<a href="./" class="menuButton posts qtipTitle {$postsActive}" title="{$lang.posts}"></a>
-			
 				{if !$loggedIn}
 				<div style="float:right;position:relative;margin-right:24px;">
 					{$styleColor}
@@ -119,6 +115,8 @@
 					</script>
 				{/literal}
 				{/if}
+				<a href="polls" class="menuButton polls qtipTitle {$pollsActive}" title="{$lang.polls}"></a>
+				<a href="./" class="menuButton posts qtipTitle {$postsActive}" title="{$lang.posts}"></a>
 		</div>
 		<div class="sidebarContainer">
 		{if $loggedIn}
@@ -149,99 +147,11 @@
 		<button class="soundButton on styleColorBackground" title="{$lang.muteSound}"></button>
 		
 		{else}
-		<div style="float:right">
-			<div class="loginFormContainer styleColorBorder">
-				<div class="titleContainer styleColorBackground"><span class="loginIcon"></span>{$lang.login}</div>
-				<form id="loginForm" class="loginForm" method="post" action="index.php?task=login">
-					<div id="loginErrorContainer" class="errorContainer">
-					{if $loginError}
-						{$loginError}
-					{/if}
-					</div>
-					<label for="username">{$lang.email}:</label><input class="text" type="text" name="username" id="loginUsername"><br clear="all" />
-					<label for="password">{$lang.password}:</label><input class="text" type="password" name="password" id="loginPassword">
-					<input type="submit" class="submit opButton" value="{$lang.login}">
-				</form>
-				<br clear="right"/>
-			</div>
-			<div class="loginFormContainer styleColorBorder">
-				<div class="titleContainer styleColorBackground"><span class="registerIcon"></span>{$lang.register}</div>
-				<form id="registerForm" class="loginForm " method="post" action="index.php?task=register">
-					<div id="registerErrorContainer" class="errorContainer">
-					{if $registerError}
-						{$registerError}
-					{/if}
-					</div>
-					<label for="email">{$lang.email}:</label><input class="text" type="text" name="email" id="email"><br clear="all" />
-					<label for="password">{$lang.password}:</label><input class="text" type="password" name="password" id="registerPassword"><br clear="all" />
-					<label for="password" title="{$lang.repeatPassword}">{$lang.repeatPassword}:</label><input class="text" type="password" name="passwordRepeat" id="registerPasswordRepeat" />
-					<label for="username" title="{$lang.nickname}">{$lang.nickname}:</label><input class="text" type="text" name="username" id="registerUsername" />
-					<input type="submit" class="submit opButton" value="{$lang.register}" />
-				</form>
-				{literal}
-				<script type="text/javascript">
-					$("#loginForm").validate({
-						errorLabelContainer: "#loginErrorContainer",
-						rules:{
-							username:{
-								required:true,
-								email:true
-							},
-							password:{
-								required:true,
-								minlength:4
-							}
-						},
-						messages:{
-							username:"Bitte geben Sie die E-Mail-Adresse an mit der Sie sich registriert haben!",
-							password:{
-								required:"Bitte geben Sie ein Passwort ein!",
-								minlength:"Das Passwort muss mindestens 5 Zeichen lang sein."
-							}
-						}
-					});
-					$("#registerForm").validate({
-						errorLabelContainer: "#registerErrorContainer",
-						rules:{
-							email:{
-								required:true,
-								email:true
-							},
-							password:{
-								required:true,
-								minlength:5
-							},
-							passwordRepeat:{
-								equalTo:"#registerPassword"
-							},
-							username: {
-								required:true
-							}
-						},
-						messages:{
-							email:"Bitte geben Sie eine g&uuml;ltige E-Mail-Adresse an!",
-							password:{
-								required:"Bitte geben Sie ein Passwort ein!",
-								minlength:"Das Passwort muss mindestens 5 Zeichen lang sein."
-							},
-							passwordRepeat:{
-								equalTo:"Die Passw&ouml;rter stimmen nicht &uuml;berein."
-							},
-							username:"Bitte geben Sie einen Benutzernamen ein"
-						}
-					})
-
-				</script>
-				{/literal}
-				<br clear="right" />
-				
-				<br clear="right" />
-			</div>
-		</div>
+			{include file='login.tpl' }
 		{/if}
 		<br />
 		<a href="impressum.html" class="styleColor" style="float:right">{$lang.imprint}</a>
-		<a href="http://www.github.com/grilly86/onlinepartei/"  target="_blank" style="float:right;margin-right:10px;">{$lang.getSourceCode}</a>
+		<a href="http://www.github.com/grilly86/onlinepartei/" class="styleColor"  target="_blank" style="float:right;margin-right:10px;">{$lang.getSourceCode}</a>
 				
 		</div>
 		<div id="sessionError">

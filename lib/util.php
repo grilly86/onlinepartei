@@ -2,7 +2,7 @@
 	include_once("static/jsonwrapper/jsonwrapper.php");
 	include_once("static/markdown.php");
 	
-	define("ALLOWED_TAGS", "<a><b><p><strong><em><h1><h2><h3><h4><h5><h6><br><img><div><span><code><blockquote><pre><table><tr><td><th>");
+	define("ALLOWED_TAGS", "<a><b><p><strong><em><h1><h2><h3><h4><h5><h6><br><img><div><span><code><blockquote><pre><table><tr><td><th><ul><ol><li>");
 	
 	class Util
 	{
@@ -113,7 +113,7 @@ function _handle_URL_callback($matches)
 	}
 	
 	// otherwise handle as normal LINK
-	return '<a target="_blank" class="styleColor" href="'. $matches[0] .'">'. $matches[0] .'</a>';
+	return '<a target="_blank" href="'. $matches[0] .'">'. $matches[0] .'</a>';
 }
 
 function getOembed($url)
